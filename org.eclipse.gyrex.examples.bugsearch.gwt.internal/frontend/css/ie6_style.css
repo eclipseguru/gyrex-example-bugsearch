@@ -1,0 +1,36 @@
+#midcolumnwide {
+	float:none;
+	padding-bottom:100px;
+}
+
+#rightcolumnwide {
+	float:left;
+	position:absolute;
+	right:0px;
+	top:125px;
+	margin-right: 3px;
+}
+
+.warning_ie6 {
+	width:100%; 
+	position:absolute; 
+	left:0; 
+	top:-9px; 
+	z-index:500;
+}
+	.warning_ie6 span {
+		display:block; 
+		position:relative; 
+		left:0; 
+		top:50%; 
+		border-top:solid 1px #fff; 
+		border-bottom:solid 1px #fff; 
+		background-color:red; 
+		padding:5px 10px; 
+		font-weight:bold; 
+		color:#fff;
+	}
+	.warning_ie6 a {
+		text-transform:uppercase; 
+		color:#fff;
+	}	

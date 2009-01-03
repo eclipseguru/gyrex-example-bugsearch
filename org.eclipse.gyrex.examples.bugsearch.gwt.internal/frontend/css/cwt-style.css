@@ -1,0 +1,84 @@
+/* CWT specific styles */
+.cwt-DialogField {
+	padding-top: 1em;
+}
+
+.cwt-DialogField-field label {
+	padding-left: 0.2em;
+}
+
+.cwt-DialogField-description {
+	padding-top: 0.5em;
+	padding-left: 1.5em;
+}
+
+/* DialogFieldGroup */
+fieldset,img {
+	border: 0 none;
+}
+
+.cwt-WizardContainer-Pages {
+	height: 280px;
+	overflow: auto;
+}
+
+.cwt-WizardContainer-Buttons {
+	margin-top: 0.2em;
+}
+
+.cwt-TextInput,
+.cwt-NumberInput {
+	/*font-family: sans-serif;
+	font-size: 100%;*/
+}
+
+.cwt-TextInput-field {
+	margin: 0em 0.1em;
+	border: 1px solid #b3b3b3;
+}
+
+.cwt-TextInput-field-error {
+	background: #f9f7ba;
+}
+
+.cwt-TextInput-label {
+	min-width: 4em;
+	margin-right: 1em
+}
+
+.cwt-NumberInput-field {
+	margin: 0em 0.1em;
+	border: 1px solid #b3b3b3;
+}
+
+.cwt-NumberInput-field:focus {
+	border-color: #406b9b;
+}
+
+.cwt-NumberInput-field-error {
+	background-color: #f9f7ba;
+}
+
+.cwt-NumberInput-field-error:focus {
+	background-color: #f9f999;
+}
+
+.cwt-NumberInput-label {
+	min-width: 4em;
+	margin-right: 1em
+}
+
+.cwt-DialogFieldGroup fieldset {
+	border: 1px solid #000;
+	display: block;
+	padding: 1em 2em;
+	clear: both;
+	margin: 2em 0 0 0;
+}
+
+/* used for loading detection */
+.cwt-Reference {
+	height: 5px;
+	width: 5px;
+	zoom: 1;
+}

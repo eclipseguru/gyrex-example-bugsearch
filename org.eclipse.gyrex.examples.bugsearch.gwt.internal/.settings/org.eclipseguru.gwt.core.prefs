@@ -1,0 +1,7 @@
+#Sat Dec 27 21:52:38 CET 2008
+autoBuildModules=false
+compilerVmArgs=
+deploymentPath=/gwt
+eclipse.preferences.version=1
+hostedDeployMode=true
+outputLocation=bin.gwt
