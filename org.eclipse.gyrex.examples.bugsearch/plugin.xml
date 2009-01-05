@@ -24,7 +24,7 @@
                symbolicName="org.eclipse.cloudfree.cds.model.solr">
          </requireBundle>
          <requireBundle
-               symbolicName="org.eclipse.cloudfree.listings.service.solr">
+               symbolicName="org.eclipse.cloudfree.cds.service.solr">
          </requireBundle>
          <requireBundle
                symbolicName="org.eclipse.cloudfree.persistence.solr">

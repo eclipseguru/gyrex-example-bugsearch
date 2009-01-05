@@ -67,28 +67,28 @@ public class BugSearchRTSetup {
 		configurationService.putString("org.eclipse.cloudfree.persistence", "repositories/" + REPOSITORY_ID + "//type", "org.eclipse.cloudfree.persistence.solr.embedded", null, false);
 		new PlatformScope().getNode("org.eclipse.cloudfree.persistence").flush();
 
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/classification", "Classification,field,classification_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/product", "Product,field,product_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/component", "Component,field,component_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/keywords", "Keywords,field,keywords_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/tags", "Tags,field,tags_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/status", "Status,field,status_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/resolution", "Resolution,field,resolution_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/targetMilestone", "Milestone,field,targetMilestone_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/version", "Version,field,version_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/statusWhiteboard", "Whiteboard,field,statusWhiteboard_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/priority", "Priority,field,priority_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/severity", "Severity,field,severity_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/hardware", "Hardware,field,hardware_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/os", "OS,field,os_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/assignee", "Assignee,field,assignee_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/reporter", "Reporter,field,reporter_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/cc", "CC,field,cc_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/commenter", "Commenter,field,commenter_facet", null, false);
-		//		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/", ",field,_facet", null, false);
-		//		configurationService.putString("org.eclipse.cloudfree.listings.service.solr", "facets/", ",field,_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/classification", "Classification,field,classification_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/product", "Product,field,product_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/component", "Component,field,component_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/keywords", "Keywords,field,keywords_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/tags", "Tags,field,tags_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/status", "Status,field,status_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/resolution", "Resolution,field,resolution_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/targetMilestone", "Milestone,field,targetMilestone_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/version", "Version,field,version_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/statusWhiteboard", "Whiteboard,field,statusWhiteboard_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/priority", "Priority,field,priority_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/severity", "Severity,field,severity_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/hardware", "Hardware,field,hardware_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/os", "OS,field,os_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/assignee", "Assignee,field,assignee_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/reporter", "Reporter,field,reporter_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/cc", "CC,field,cc_facet", null, false);
+		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/commenter", "Commenter,field,commenter_facet", null, false);
+		//		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/", ",field,_facet", null, false);
+		//		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/", ",field,_facet", null, false);
 
-		new PlatformScope().getNode("org.eclipse.cloudfree.listings.service.solr").flush();
+		new PlatformScope().getNode("org.eclipse.cloudfree.cds.service.solr").flush();
 	}
 
 	private boolean initializeSolrCore() throws URISyntaxException, IOException, SolrServerException, ParserConfigurationException, SAXException {

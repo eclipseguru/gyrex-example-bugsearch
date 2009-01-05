@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.cloudfree.examples.bugsearch.internal;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -425,9 +426,13 @@ public class BugSearchDataImport extends Job {
 
 				BundleDebug.debug("Published " + publisher.getBugsCount() + " bugs.");
 
-				// commit && optimize
+				// commit
 				solrRepository.commit(true, false);
-				solrRepository.optimize(false, false);
+
+				// optimize after initial import or at night
+				if ((mode == Mode.INITIAL) || (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == 1)) {
+					solrRepository.optimize(false, false);
+				}
 			} finally {
 				//CommonsNetPlugin.getExecutorService().shutdown();
 			}
