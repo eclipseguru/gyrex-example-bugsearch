@@ -153,7 +153,7 @@ public class SolrServlet extends HttpServlet {
 							}
 
 						}
-						//else http HEAD request, nothing to write out, waited this long just to get ContentType
+						//else http HEAD request, nothing to write out, waited this long just to get RepositoryContentType
 					}
 				}
 				return; // we are done with a valid handler
