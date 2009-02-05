@@ -13,7 +13,7 @@ package org.eclipse.cloudfree.examples.bugsearch.internal.setup;
 
 import org.eclipse.cloudfree.admin.configuration.wizard.ConfigurationWizardStep;
 import org.eclipse.cloudfree.toolkit.CWT;
-import org.eclipse.cloudfree.toolkit.content.SelectionFlagContent;
+import org.eclipse.cloudfree.toolkit.content.BooleanContent;
 import org.eclipse.cloudfree.toolkit.content.TextContent;
 import org.eclipse.cloudfree.toolkit.runtime.commands.CommandExecutionEvent;
 import org.eclipse.cloudfree.toolkit.widgets.Checkbox;
@@ -65,8 +65,8 @@ public class FanShopSetupStep extends ConfigurationWizardStep {
 	 */
 	@Override
 	public boolean wizardFinished(final CommandExecutionEvent finishEvent) {
-		final SelectionFlagContent deploy = (SelectionFlagContent) finishEvent.getContentSet().getEntry("bugsearch-deploy");
-		if ((null != deploy) && deploy.isSelected()) {
+		final BooleanContent deploy = (BooleanContent) finishEvent.getContentSet().getEntry("bugsearch-deploy");
+		if ((null != deploy) && deploy.getValue()) {
 			try {
 				BugSearchDevSetup.enableServerRole();
 				final TextContent url = (TextContent) finishEvent.getContentSet().getEntry("bugsearch-url");
