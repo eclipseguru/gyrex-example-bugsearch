@@ -63,7 +63,7 @@ public class BugSearchRTSetup {
 
 	private void configureRepositories() throws BackingStoreException {
 		final IConfigurationService configurationService = PlatformConfiguration.getConfigurationService();
-		configurationService.putString("org.eclipse.cloudfree.persistence", "repositories//application/x-cf-bugs-solr", REPOSITORY_ID, null, false);
+		configurationService.putString("org.eclipse.cloudfree.persistence", "repositories//application/x-cf-listings-solr", REPOSITORY_ID, null, false);
 		configurationService.putString("org.eclipse.cloudfree.persistence", "repositories/" + REPOSITORY_ID + "//type", "org.eclipse.cloudfree.persistence.solr.embedded", null, false);
 		new PlatformScope().getNode("org.eclipse.cloudfree.persistence").flush();
 
