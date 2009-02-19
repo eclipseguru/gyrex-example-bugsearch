@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.4"?>
+<?pde version="3.5"?>
 
-<product name="CloudFree Fanshop (Incubation)" id="org.eclipse.cloudfree.examples.bugsearch.product" application="org.eclipse.cloudfree.boot.server" version="0.7 ESE2008 (Incubation)" useFeatures="false">
+<product name="CloudFree BugSearch (Incubation)" id="org.eclipse.cloudfree.examples.bugsearch.product" application="org.eclipse.cloudfree.boot.server" version="1.0" useFeatures="false">
 
    <configIni use="default">
       <linux>/org.eclipse.cloudfree.examples.bugsearch/config.ini</linux>
@@ -44,6 +44,13 @@
       <plugin id="org.apache.commons.logging"/>
       <plugin id="org.apache.jasper"/>
       <plugin id="org.apache.lucene"/>
+      <plugin id="org.apache.lucene.analysis"/>
+      <plugin id="org.apache.lucene.core"/>
+      <plugin id="org.apache.lucene.highlighter"/>
+      <plugin id="org.apache.lucene.memory"/>
+      <plugin id="org.apache.lucene.queries"/>
+      <plugin id="org.apache.lucene.snowball"/>
+      <plugin id="org.apache.lucene.spellchecker"/>
       <plugin id="org.apache.solr.client.solrj"/>
       <plugin id="org.apache.solr.client.solrj.embedded"/>
       <plugin id="org.apache.solr.common"/>
@@ -55,20 +62,20 @@
       <plugin id="org.eclipse.cloudfree.admin.web.gwt.client"/>
       <plugin id="org.eclipse.cloudfree.boot"/>
       <plugin id="org.eclipse.cloudfree.boot.defaultroles"/>
+      <plugin id="org.eclipse.cloudfree.cds.model"/>
+      <plugin id="org.eclipse.cloudfree.cds.model.solr"/>
+      <plugin id="org.eclipse.cloudfree.cds.service"/>
+      <plugin id="org.eclipse.cloudfree.cds.service.solr"/>
       <plugin id="org.eclipse.cloudfree.common"/>
       <plugin id="org.eclipse.cloudfree.configuration"/>
       <plugin id="org.eclipse.cloudfree.configuration.impl"/>
       <plugin id="org.eclipse.cloudfree.examples.bugsearch"/>
+      <plugin id="org.eclipse.cloudfree.examples.bugsearch.gwt.internal"/>
       <plugin id="org.eclipse.cloudfree.gwt.common"/>
       <plugin id="org.eclipse.cloudfree.gwt.service"/>
       <plugin id="org.eclipse.cloudfree.http"/>
-      <plugin id="org.eclipse.cloudfree.http.errorpagehandler" fragment="true"/>
-      <plugin id="org.eclipse.cloudfree.http.errorpagehandler.resources"/>
+      <plugin id="org.eclipse.cloudfree.http.jetty"/>
       <plugin id="org.eclipse.cloudfree.http.registry"/>
-      <plugin id="org.eclipse.cloudfree.cds.model"/>
-      <plugin id="org.eclipse.cloudfree.cds.model.solr"/>
-      <plugin id="org.eclipse.cloudfree.listings.service"/>
-      <plugin id="org.eclipse.cloudfree.listings.service.solr"/>
       <plugin id="org.eclipse.cloudfree.model.common"/>
       <plugin id="org.eclipse.cloudfree.monitoring"/>
       <plugin id="org.eclipse.cloudfree.persistence"/>
@@ -80,6 +87,9 @@
       <plugin id="org.eclipse.cloudfree.toolkit.runtime"/>
       <plugin id="org.eclipse.core.contenttype"/>
       <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.net"/>
+      <plugin id="org.eclipse.core.net.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.net.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.equinox.app"/>
       <plugin id="org.eclipse.equinox.common"/>
@@ -88,18 +98,37 @@
       <plugin id="org.eclipse.equinox.http.servlet"/>
       <plugin id="org.eclipse.equinox.jsp.jasper"/>
       <plugin id="org.eclipse.equinox.launcher"/>
-      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86"/>
+      <plugin id="org.eclipse.equinox.launcher.carbon.macosx" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.gtk.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.motif.aix.ppc" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.motif.hpux.ia64_32" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.equinox.launcher.wpf.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.registry"/>
       <plugin id="org.eclipse.equinox.security"/>
+      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
       <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.transforms.hook" fragment="true"/>
+      <plugin id="org.eclipse.mylyn.bugzilla.core"/>
+      <plugin id="org.eclipse.mylyn.commons.core"/>
+      <plugin id="org.eclipse.mylyn.commons.net"/>
+      <plugin id="org.eclipse.mylyn.tasks.core"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.osgi.source"/>
       <plugin id="org.eclipse.osgi.util"/>
+      <plugin id="org.eclipse.rap.equinox.registry" fragment="true"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.mortbay.jetty.server"/>
       <plugin id="org.mortbay.jetty.util"/>
    </plugins>
+
 
 </product>
