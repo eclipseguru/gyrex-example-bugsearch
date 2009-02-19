@@ -13,9 +13,11 @@ package org.eclipse.cloudfree.examples.bugsearch.internal;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.cloudfree.common.logging.LogAudience;
+import org.eclipse.cloudfree.common.logging.LogImportance;
+import org.eclipse.cloudfree.common.logging.LogSource;
 import org.eclipse.cloudfree.common.runtime.BaseBundleActivator;
 import org.eclipse.cloudfree.common.services.IServiceProxy;
-import org.eclipse.cloudfree.configuration.PlatformConfiguration;
 import org.eclipse.cloudfree.examples.bugsearch.internal.app.BugSearchApplicationProvider;
 import org.eclipse.cloudfree.http.application.provider.ApplicationProvider;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -68,29 +70,23 @@ public class BugSearchActivator extends BaseBundleActivator {
 		// register application provider
 		getServiceHelper().registerService(ApplicationProvider.class.getName(), new BugSearchApplicationProvider(), "CloudFree.net", "Application provider for the extensible Fan Shop application.", null, null);
 
-		// create default environment in dev mode
-		if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
-			new Job("Initializing Fan Shop") {
-
-				@Override
-				protected IStatus run(final IProgressMonitor monitor) {
-					try {
-						fanShopRTSetup = new BugSearchRTSetup(BugSearchActivator.getInstance().getBundle().getBundleContext());
-						fanShopRTSetup.runtimeSetup();
-					} catch (final IllegalStateException e) {
-						// already shutdown
-						return Status.CANCEL_STATUS;
-					} catch (final Exception e) {
-						// TODO consider logging this
-						System.err.println("Error during fan shop initialization!");
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					}
-					return Status.OK_STATUS;
+		// create environment
+		new Job("Initializing Bug Search") {
+			@Override
+			protected IStatus run(final IProgressMonitor monitor) {
+				try {
+					fanShopRTSetup = new BugSearchRTSetup(BugSearchActivator.getInstance().getBundle().getBundleContext());
+					fanShopRTSetup.runtimeSetup();
+				} catch (final IllegalStateException e) {
+					// already shutdown
+					return Status.CANCEL_STATUS;
+				} catch (final Exception e) {
+					getLog().log("Error during bug search initialization!", e, (Object) null, LogImportance.ERROR, LogAudience.DEVELOPER, LogAudience.ADMIN, LogSource.APPLICATION);
+					return Status.CANCEL_STATUS;
 				}
-
-			}.schedule();
-		}
+				return Status.OK_STATUS;
+			}
+		}.schedule();
 	}
 
 	/* (non-Javadoc)
