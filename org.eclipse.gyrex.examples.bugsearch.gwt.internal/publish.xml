@@ -9,26 +9,4 @@
     Contributors:
         Gunnar Wagenknecht - initial API and implementation
  -->
-
-<project default="publish" basedir=".">
-
-	<available file="bin.gwt/org.eclipse.cloudfree.examples.bugsearch.gwt.internal.BugSearch" property="frontend.exists" />
-
-	<target name="publish" depends="sync.frontend">
-		<echo level="info" message="Done!" />
-	</target>
-
-	<target name="sync.frontend" if="frontend.exists">		<sync todir="frontend" includeemptydirs="true">			<fileset dir="bin.gwt/org.eclipse.cloudfree.examples.bugsearch.gwt.internal.BugSearch"/>		</sync>		<!--
-		<echo level="info" message="Removing existing cache files" />
-		<delete>
-			<fileset dir="frontend">
-				<include name="*.cache.*" />
-			</fileset>
-		</delete>
-		<echo level="info" message="Synchronizing frontend files..." />
-		<copy todir="frontend">
-			<fileset dir="bin.gwt/org.eclipse.cloudfree.examples.bugsearch.gwt.internal.BugSearch"/>
-		</copy>		-->
-	</target>
-
-</project>
+<project default="publish" basedir=".">	<property name="module" value="org.eclipse.cloudfree.examples.bugsearch.gwt.internal.BugSearch"/>	<property name="module.output" location="bin.gwt/${module}"/>	<property name="sync.target" location="frontend"/>	<target name="publish" depends="sync.module">		<echo level="info" message="Done!" />	</target>	<target name="sync.module" depends="compile.module">		<echo level="info" message="Removing existing cache files" />		<delete>			<fileset dir="${sync.target}">				<include name="*.cache.*" />                <include name="*.gwt.rpc" />			</fileset>		</delete>		<echo level="info" message="Synchronizing module files..." />		<copy todir="${sync.target}">			<fileset dir="${module.output}" excludes="**/.svn/**,**/CVS/**" />		</copy>	</target>	<target name="compile.module">		<echo level="info" message="Compiling Module" />		<gwt.compilemodule moduleId="${module}"/>	</target></project>

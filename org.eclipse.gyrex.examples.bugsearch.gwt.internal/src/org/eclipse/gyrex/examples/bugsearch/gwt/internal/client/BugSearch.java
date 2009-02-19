@@ -32,6 +32,7 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.HistoryListener;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -136,6 +137,7 @@ public class BugSearch implements EntryPoint {
 	private RootPanel mainPanel;
 	private HorizontalPanel activeFiltersPanel;
 	private SearchProgress searchProgress;
+	private Anchor activeFiltersAnchor;
 
 	private void clearAllResultsAndFilters() {
 		activeFiltersPanel.clear();
@@ -148,7 +150,10 @@ public class BugSearch implements EntryPoint {
 		activeFiltersPanel = new HorizontalPanel();
 		activeFiltersPanel.setSpacing(5);
 
+		activeFiltersAnchor = new Anchor();
+
 		parent.add(new HTML("<h3>Active Filters</h3>"));
+		parent.add(activeFiltersAnchor);
 		parent.add(activeFiltersPanel);
 	}
 
@@ -303,6 +308,7 @@ public class BugSearch implements EntryPoint {
 					query = "";
 				}
 				setSearchFieldText(query);
+				setAnchorName(historyToken);
 				search(query);
 			}
 		});
@@ -405,6 +411,10 @@ public class BugSearch implements EntryPoint {
 		currentSearchServiceCallback = searchServiceCallback;
 
 		bugSearchService.findBugs(query, getHistoryManager().getActiveFilters(), searchServiceCallback);
+	}
+
+	void setAnchorName(final String name) {
+		activeFiltersAnchor.setName(name);
 	}
 
 	private void setSearchError(final Throwable caught) {
