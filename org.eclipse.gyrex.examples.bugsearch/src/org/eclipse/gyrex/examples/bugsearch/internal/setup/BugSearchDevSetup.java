@@ -11,9 +11,12 @@
  *******************************************************************************/
 package org.eclipse.cloudfree.examples.bugsearch.internal.setup;
 
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.cloudfree.common.debug.BundleDebug;
 import org.eclipse.cloudfree.configuration.PlatformConfiguration;
 import org.eclipse.cloudfree.configuration.preferences.PlatformScope;
 import org.eclipse.cloudfree.configuration.service.IConfigurationService;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 public class BugSearchDevSetup {
@@ -23,15 +26,23 @@ public class BugSearchDevSetup {
 	public static final String URL = "url";
 
 	public static void enableServerRole() throws BackingStoreException {
-		//"org.eclipse.cloudfree.examples.bugsearch"
-		String roles = PlatformConfiguration.getConfigurationService().getString("org.eclipse.cloudfree.boot", "rolesToStart", null, null);
-		if ((null == roles) || (roles.length() == 0)) {
-			roles = PLUGIN_ID_BUGSEARCH;
-		} else {
-			roles += ",org.eclipse.cloudfree.examples.bugsearch";
+		// enable required server roles
+		//  - org.eclipse.cloudfree.boot.role.admin.gwt
+		//  - org.eclipse.cloudfree.boot.role.http.registry
+		//  - org.eclipse.cloudfree.boot.role.http.jetty
+		//  - org.eclipse.cloudfree.examples.bugsearch
+		try {
+			final IEclipsePreferences preferences = new PlatformScope().getNode("org.eclipse.cloudfree.boot");
+			String roles = preferences.get("rolesToStart", "");
+			if (StringUtils.isNotBlank(roles)) {
+				roles += ",";
+			}
+			roles += "org.eclipse.cloudfree.boot.role.admin.gwt,org.eclipse.cloudfree.boot.role.http.registry,org.eclipse.cloudfree.boot.role.http.jetty,org.eclipse.cloudfree.examples.bugsearch";
+			preferences.put("rolesToStart", roles);
+			preferences.flush();
+		} catch (final Exception e) {
+			BundleDebug.debug("Error while activating required server roles. " + e.getMessage(), e);
 		}
-		PlatformConfiguration.getConfigurationService().putString("org.eclipse.cloudfree.boot", "rolesToStart", roles, null, false);
-		new PlatformScope().getNode("org.eclipse.cloudfree.boot").flush();
 	}
 
 	public static void setFanShopUrl(final String url) throws BackingStoreException {
