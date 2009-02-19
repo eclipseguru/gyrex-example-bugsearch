@@ -124,7 +124,6 @@
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.osgi.source"/>
       <plugin id="org.eclipse.osgi.util"/>
-      <plugin id="org.eclipse.rap.equinox.registry" fragment="true"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.mortbay.jetty.server"/>
       <plugin id="org.mortbay.jetty.util"/>
