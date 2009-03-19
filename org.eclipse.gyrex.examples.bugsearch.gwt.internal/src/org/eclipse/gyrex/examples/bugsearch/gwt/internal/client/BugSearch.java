@@ -39,6 +39,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -182,18 +183,31 @@ public class BugSearch implements EntryPoint {
 				}
 			}
 		});
+		searchField.addKeyboardListener(new KeyboardListener() {
+
+			public void onKeyDown(final Widget sender, final char keyCode, final int modifiers) {
+				// empty
+			}
+
+			public void onKeyPress(final Widget sender, final char keyCode, final int modifiers) {
+				if (keyCode == KeyboardListener.KEY_ENTER) {
+					doSearch();
+					return;
+				}
+			}
+
+			public void onKeyUp(final Widget sender, final char keyCode, final int modifiers) {
+				// empty
+			}
+		});
 
 		searchUnresolvedButton = new Button();
 		searchUnresolvedButton.setText(SEARCH_UNRESOLVED);
 		searchUnresolvedButton.addClickListener(new ClickListener() {
 			public void onClick(final Widget sender) {
-				String query = searchField.getText();
-				if (EMPTY_SEARCH_FIELD_TEXT.equals(query)) {
-					query = "";
-				}
-				getHistoryManager().setQuery(query);
-				getHistoryManager().setActiveFilter("status", "UNCONFIRMED", "NEW", "ASSIGNED");
+				doSearchUnresolved();
 			}
+
 		});
 
 		searchResolvedButton = new Button();
@@ -201,12 +215,7 @@ public class BugSearch implements EntryPoint {
 		searchResolvedButton.addClickListener(new ClickListener() {
 
 			public void onClick(final Widget sender) {
-				String query = searchField.getText();
-				if (EMPTY_SEARCH_FIELD_TEXT.equals(query)) {
-					query = "";
-				}
-				getHistoryManager().setQuery(query);
-				getHistoryManager().setActiveFilter("status", "RESOLVED", "VERIFIED", "CLOSED");
+				doSearchResolved();
 			}
 		});
 
@@ -215,13 +224,7 @@ public class BugSearch implements EntryPoint {
 		searchButton.addClickListener(new ClickListener() {
 
 			public void onClick(final Widget sender) {
-				String query = searchField.getText();
-				if (EMPTY_SEARCH_FIELD_TEXT.equals(query)) {
-					query = "";
-				}
-				getHistoryManager().setQuery(query);
-				//getHistoryManager().setActiveFilter("status", "RESOLVED", "VERIFIED", "CLOSED");
-				search(query);
+				doSearch();
 			}
 		});
 
@@ -240,6 +243,36 @@ public class BugSearch implements EntryPoint {
 		panel.add(searchResultMessage);
 
 		parent.add(panel);
+	}
+
+	void doSearch() {
+		final String query = getQuery();
+
+		// remember query
+		getHistoryManager().setQuery(query);
+
+		// search
+		search(query);
+	}
+
+	void doSearchResolved() {
+		final String query = getQuery();
+
+		// remember query
+		getHistoryManager().setQuery(query);
+
+		// setActiveFilter will trigger search
+		getHistoryManager().setActiveFilter("status", "RESOLVED", "VERIFIED", "CLOSED");
+	}
+
+	void doSearchUnresolved() {
+		final String query = getQuery();
+
+		// remember query
+		getHistoryManager().setQuery(query);
+
+		// setActiveFilter will trigger search
+		getHistoryManager().setActiveFilter("status", "UNCONFIRMED", "NEW", "ASSIGNED");
 	}
 
 	void error(final Throwable caught) {
@@ -263,6 +296,14 @@ public class BugSearch implements EntryPoint {
 			historyManager = new BugSearchHistoryManager();
 		}
 		return historyManager;
+	}
+
+	private String getQuery() {
+		String query = searchField.getText();
+		if (EMPTY_SEARCH_FIELD_TEXT.equals(query)) {
+			query = "";
+		}
+		return query;
 	}
 
 	/**
