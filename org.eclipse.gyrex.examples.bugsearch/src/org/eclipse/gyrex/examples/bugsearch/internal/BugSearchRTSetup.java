@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal;
+package org.eclipse.gyrex.examples.bugsearch.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,17 +25,17 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
-import org.eclipse.cloudfree.configuration.PlatformConfiguration;
-import org.eclipse.cloudfree.configuration.preferences.PlatformScope;
-import org.eclipse.cloudfree.configuration.service.IConfigurationService;
-import org.eclipse.cloudfree.examples.bugsearch.internal.app.BugSearchApplicationProvider;
-import org.eclipse.cloudfree.examples.bugsearch.internal.setup.BugSearchDevSetup;
-import org.eclipse.cloudfree.http.application.manager.ApplicationRegistrationException;
-import org.eclipse.cloudfree.http.application.manager.IApplicationManager;
-import org.eclipse.cloudfree.http.application.manager.MountConflictException;
-import org.eclipse.cloudfree.http.internal.apps.dummy.RootContext;
-import org.eclipse.cloudfree.persistence.solr.internal.SolrActivator;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.gyrex.configuration.PlatformConfiguration;
+import org.eclipse.gyrex.configuration.preferences.PlatformScope;
+import org.eclipse.gyrex.configuration.service.IConfigurationService;
+import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
+import org.eclipse.gyrex.examples.bugsearch.internal.setup.BugSearchDevSetup;
+import org.eclipse.gyrex.http.application.manager.ApplicationRegistrationException;
+import org.eclipse.gyrex.http.application.manager.IApplicationManager;
+import org.eclipse.gyrex.http.application.manager.MountConflictException;
+import org.eclipse.gyrex.http.internal.apps.dummy.RootContext;
+import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
@@ -63,32 +63,32 @@ public class BugSearchRTSetup {
 
 	private void configureRepositories() throws BackingStoreException {
 		final IConfigurationService configurationService = PlatformConfiguration.getConfigurationService();
-		configurationService.putString("org.eclipse.cloudfree.persistence", "repositories//application/x-cf-listings-solr", REPOSITORY_ID, null, false);
-		configurationService.putString("org.eclipse.cloudfree.persistence", "repositories/" + REPOSITORY_ID + "//type", "org.eclipse.cloudfree.persistence.solr.embedded", null, false);
-		new PlatformScope().getNode("org.eclipse.cloudfree.persistence").flush();
+		configurationService.putString("org.eclipse.gyrex.persistence", "repositories//application/x-cf-listings-solr", REPOSITORY_ID, null, false);
+		configurationService.putString("org.eclipse.gyrex.persistence", "repositories/" + REPOSITORY_ID + "//type", "org.eclipse.gyrex.persistence.solr.embedded", null, false);
+		new PlatformScope().getNode("org.eclipse.gyrex.persistence").flush();
 
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/classification", "Classification,field,classification_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/product", "Product,field,product_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/component", "Component,field,component_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/keywords", "Keywords,field,keywords_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/tags", "Tags,field,tags_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/status", "Status,field,status_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/resolution", "Resolution,field,resolution_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/targetMilestone", "Milestone,field,targetMilestone_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/version", "Version,field,version_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/statusWhiteboard", "Whiteboard,field,statusWhiteboard_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/priority", "Priority,field,priority_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/severity", "Severity,field,severity_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/hardware", "Hardware,field,hardware_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/os", "OS,field,os_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/assignee", "Assignee,field,assignee_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/reporter", "Reporter,field,reporter_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/cc", "CC,field,cc_facet", null, false);
-		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/commenter", "Commenter,field,commenter_facet", null, false);
-		//		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/", ",field,_facet", null, false);
-		//		configurationService.putString("org.eclipse.cloudfree.cds.service.solr", "facets/", ",field,_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/classification", "Classification,field,classification_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/product", "Product,field,product_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/component", "Component,field,component_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/keywords", "Keywords,field,keywords_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/tags", "Tags,field,tags_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/status", "Status,field,status_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/resolution", "Resolution,field,resolution_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/targetMilestone", "Milestone,field,targetMilestone_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/version", "Version,field,version_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/statusWhiteboard", "Whiteboard,field,statusWhiteboard_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/priority", "Priority,field,priority_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/severity", "Severity,field,severity_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/hardware", "Hardware,field,hardware_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/os", "OS,field,os_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/assignee", "Assignee,field,assignee_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/reporter", "Reporter,field,reporter_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/cc", "CC,field,cc_facet", null, false);
+		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/commenter", "Commenter,field,commenter_facet", null, false);
+		//		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/", ",field,_facet", null, false);
+		//		configurationService.putString("org.eclipse.gyrex.cds.service.solr", "facets/", ",field,_facet", null, false);
 
-		new PlatformScope().getNode("org.eclipse.cloudfree.cds.service.solr").flush();
+		new PlatformScope().getNode("org.eclipse.gyrex.cds.service.solr").flush();
 	}
 
 	private boolean initializeSolrCore() throws URISyntaxException, IOException, SolrServerException, ParserConfigurationException, SAXException {

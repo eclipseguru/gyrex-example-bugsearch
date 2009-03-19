@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: CloudFree BugSearch GWT UI (Incubation)
-Bundle-SymbolicName: org.eclipse.cloudfree.examples.bugsearch.gwt.internal
+Bundle-Name: Gyrex BugSearch GWT UI (Incubation)
+Bundle-SymbolicName: org.eclipse.gyrex.examples.bugsearch.gwt.internal
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Eclipse.org
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -12,5 +12,5 @@ Import-Package: com.google.gwt.core.client,
  com.google.gwt.user.client,
  com.google.gwt.user.client.rpc,
  com.google.gwt.user.client.ui
-Export-Package: org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client;x-friends:="org.eclipse.cloudfree.examples.bugsearch",
- org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service;x-friends:="org.eclipse.cloudfree.examples.bugsearch"
+Export-Package: org.eclipse.gyrex.examples.bugsearch.gwt.internal.client;x-friends:="org.eclipse.gyrex.examples.bugsearch",
+ org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service;x-friends:="org.eclipse.gyrex.examples.bugsearch"

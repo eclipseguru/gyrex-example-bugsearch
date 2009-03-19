@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  */
-package org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client;
+package org.eclipse.gyrex.examples.bugsearch.gwt.internal.client;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

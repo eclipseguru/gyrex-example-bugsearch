@@ -9,14 +9,14 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal.app;
+package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 
-import org.eclipse.cloudfree.common.context.IContext;
-import org.eclipse.cloudfree.examples.bugsearch.internal.BugSearchActivator;
-import org.eclipse.cloudfree.http.application.Application;
-import org.eclipse.cloudfree.http.application.provider.ApplicationProvider;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
+import org.eclipse.gyrex.http.application.Application;
+import org.eclipse.gyrex.http.application.provider.ApplicationProvider;
 
 /**
  * The application provider for the extensible Fan Shop application.
@@ -35,7 +35,7 @@ public class BugSearchApplicationProvider extends ApplicationProvider {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cloudfree.http.application.provider.ApplicationProvider#createApplication(java.lang.String, org.eclipse.cloudfree.common.context.IContext)
+	 * @see org.eclipse.gyrex.http.application.provider.ApplicationProvider#createApplication(java.lang.String, org.eclipse.gyrex.common.context.IContext)
 	 */
 	@Override
 	public Application createApplication(final String applicationId, final IContext context) throws CoreException {

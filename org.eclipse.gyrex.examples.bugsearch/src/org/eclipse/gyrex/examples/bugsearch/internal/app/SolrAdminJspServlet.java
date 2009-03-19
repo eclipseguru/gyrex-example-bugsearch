@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal.app;
+package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 import java.io.IOException;
 
@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
-import org.eclipse.cloudfree.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.equinox.jsp.jasper.JspServlet;
+import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 
 public class SolrAdminJspServlet extends JspServlet {
 

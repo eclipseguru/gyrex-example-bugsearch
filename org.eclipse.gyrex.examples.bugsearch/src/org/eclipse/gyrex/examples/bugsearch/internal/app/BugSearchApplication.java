@@ -9,19 +9,19 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal.app;
+package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 import javax.servlet.ServletException;
 
-import org.eclipse.cloudfree.common.context.IContext;
-import org.eclipse.cloudfree.configuration.PlatformConfiguration;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugSearchService;
-import org.eclipse.cloudfree.examples.bugsearch.internal.BugSearchActivator;
-import org.eclipse.cloudfree.examples.bugsearch.internal.BugSearchRTSetup;
-import org.eclipse.cloudfree.http.application.Application;
-import org.eclipse.cloudfree.http.registry.internal.BundleResourceProvider;
-import org.eclipse.cloudfree.persistence.solr.internal.SolrActivator;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.configuration.PlatformConfiguration;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
+import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
+import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchRTSetup;
+import org.eclipse.gyrex.http.application.Application;
+import org.eclipse.gyrex.http.registry.internal.BundleResourceProvider;
+import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
 
 /**
  * A fan shop application instance.
@@ -33,13 +33,13 @@ public class BugSearchApplication extends Application {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cloudfree.http.application.Application#doInit()
+	 * @see org.eclipse.gyrex.http.application.Application#doInit()
 	 */
 	@Override
 	protected void doInit() throws CoreException {
 		try {
 			// register the front end and its services
-			getApplicationServiceSupport().registerResources("/", "frontend", new BundleResourceProvider(BugSearchActivator.getInstance().getBundle("org.eclipse.cloudfree.examples.bugsearch.gwt.internal")));
+			getApplicationServiceSupport().registerResources("/", "frontend", new BundleResourceProvider(BugSearchActivator.getInstance().getBundle("org.eclipse.gyrex.examples.bugsearch.gwt.internal")));
 			getApplicationServiceSupport().registerServlet("/" + BugSearchService.ENTRYPOINT_SERVICE, new BugSearchServiceServlet(getContext()), null);
 
 			// register the  listing servlet

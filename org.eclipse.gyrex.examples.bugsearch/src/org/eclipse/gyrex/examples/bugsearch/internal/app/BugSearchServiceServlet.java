@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal.app;
+package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,21 +26,21 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.eclipse.cloudfree.cds.model.IListing;
-import org.eclipse.cloudfree.cds.service.IListingService;
-import org.eclipse.cloudfree.cds.service.query.ListingQuery;
-import org.eclipse.cloudfree.cds.service.result.IListingResult;
-import org.eclipse.cloudfree.cds.service.result.IListingResultFacet;
-import org.eclipse.cloudfree.cds.service.result.IListingResultFacetValue;
-import org.eclipse.cloudfree.common.context.IContext;
-import org.eclipse.cloudfree.common.debug.BundleDebug;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.Bug;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugList;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugListFilter;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugSearchService;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.ValueAscendingComparator;
-import org.eclipse.cloudfree.services.common.ServiceUtil;
+import org.eclipse.gyrex.cds.model.IListing;
+import org.eclipse.gyrex.cds.service.IListingService;
+import org.eclipse.gyrex.cds.service.query.ListingQuery;
+import org.eclipse.gyrex.cds.service.result.IListingResult;
+import org.eclipse.gyrex.cds.service.result.IListingResultFacet;
+import org.eclipse.gyrex.cds.service.result.IListingResultFacetValue;
+import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.common.debug.BundleDebug;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugList;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.ValueAscendingComparator;
+import org.eclipse.gyrex.services.common.ServiceUtil;
 
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.RPC;

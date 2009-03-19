@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal.app;
+package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,22 +34,22 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JavaTypeMapper;
-import org.eclipse.cloudfree.cds.model.IListing;
-import org.eclipse.cloudfree.cds.model.IListingAttribute;
-import org.eclipse.cloudfree.cds.model.IListingManager;
-import org.eclipse.cloudfree.cds.model.documents.Document;
-import org.eclipse.cloudfree.cds.model.solr.ISolrQueryExecutor;
-import org.eclipse.cloudfree.cds.service.IListingService;
-import org.eclipse.cloudfree.cds.service.query.ListingQuery;
-import org.eclipse.cloudfree.cds.service.query.ListingQuery.ResultDimension;
-import org.eclipse.cloudfree.cds.service.query.ListingQuery.SortDirection;
-import org.eclipse.cloudfree.cds.service.result.IListingResult;
-import org.eclipse.cloudfree.cds.service.result.IListingResultFacet;
-import org.eclipse.cloudfree.cds.service.result.IListingResultFacetValue;
-import org.eclipse.cloudfree.common.context.IContext;
-import org.eclipse.cloudfree.http.application.ApplicationException;
-import org.eclipse.cloudfree.model.common.ModelUtil;
-import org.eclipse.cloudfree.services.common.ServiceUtil;
+import org.eclipse.gyrex.cds.model.IListing;
+import org.eclipse.gyrex.cds.model.IListingAttribute;
+import org.eclipse.gyrex.cds.model.IListingManager;
+import org.eclipse.gyrex.cds.model.documents.Document;
+import org.eclipse.gyrex.cds.model.solr.ISolrQueryExecutor;
+import org.eclipse.gyrex.cds.service.IListingService;
+import org.eclipse.gyrex.cds.service.query.ListingQuery;
+import org.eclipse.gyrex.cds.service.query.ListingQuery.ResultDimension;
+import org.eclipse.gyrex.cds.service.query.ListingQuery.SortDirection;
+import org.eclipse.gyrex.cds.service.result.IListingResult;
+import org.eclipse.gyrex.cds.service.result.IListingResultFacet;
+import org.eclipse.gyrex.cds.service.result.IListingResultFacetValue;
+import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.http.application.ApplicationException;
+import org.eclipse.gyrex.model.common.ModelUtil;
+import org.eclipse.gyrex.services.common.ServiceUtil;
 
 import com.ibm.icu.text.MeasureFormat;
 import com.ibm.icu.util.CurrencyAmount;
@@ -295,7 +295,7 @@ public class JsonListingServlet extends HttpServlet {
 		writer.println("-----------------------------------");
 		writer.println();
 		writer.println("q ... the query string");
-		writer.println("      (see JavaDoc of org.eclipse.cloudfree.cds.service.query.ListingQuery#setQuery(String))");
+		writer.println("      (see JavaDoc of org.eclipse.gyrex.cds.service.query.ListingQuery#setQuery(String))");
 		writer.println("f ... a filter query (multiple possible, will be interpreted as AND; ..&f=..&f=..)");
 		writer.println("      (eg. the facet 'filter' attribute from the result set)");
 		writer.println("c ... easy retrieval of a category (multiple possible, will be interpreted as AND; ..&c=shirts&c=underwear)");
@@ -334,7 +334,7 @@ public class JsonListingServlet extends HttpServlet {
 		json.writeStartObject();
 
 		writeValue("version", "1.0", json);
-		writeValue("type", "application/x-cloudfree-fanshop-autocomplete-json", json);
+		writeValue("type", "application/x-gyrex-fanshop-autocomplete-json", json);
 
 		writeValue("queryTime", response.getQTime(), json);
 
@@ -440,7 +440,7 @@ public class JsonListingServlet extends HttpServlet {
 		json.writeStartObject();
 
 		writeValue("version", "1.0", json);
-		writeValue("type", "application/x-cloudfree-fanshop-products-json", json);
+		writeValue("type", "application/x-gyrex-fanshop-products-json", json);
 
 		json.writeFieldName("query");
 		writeQuery(result.getQuery(), json);
@@ -526,7 +526,7 @@ public class JsonListingServlet extends HttpServlet {
 		json.writeStartObject();
 
 		writeValue("version", "1.0", json);
-		writeValue("type", "application/x-cloudfree-fanshop-product-json", json);
+		writeValue("type", "application/x-gyrex-fanshop-product-json", json);
 
 		json.writeFieldName("query");
 		writeQuery(result.getQuery(), json);

@@ -12,7 +12,7 @@
  -->
  
 <!--
- This is the CloudFree Fanshop specific Solr configuration file. 
+ This is the Gyrex Fanshop specific Solr configuration file. 
  -->
 <config>
   <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>

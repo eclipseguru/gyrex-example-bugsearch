@@ -9,19 +9,19 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client;
+package org.eclipse.gyrex.examples.bugsearch.gwt.internal.client;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.Bug;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugList;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugListFilter;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugSearchService;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugSearchServiceAsync;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.widgets.ActiveFilterWidget;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.widgets.FilterCloud;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugList;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchServiceAsync;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.widgets.ActiveFilterWidget;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.widgets.FilterCloud;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;

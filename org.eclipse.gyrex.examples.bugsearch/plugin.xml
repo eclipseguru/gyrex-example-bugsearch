@@ -3,47 +3,47 @@
 <!--
     Copyright (c) 2009 AGETO Service GmbH and others.
     All rights reserved.
-     
-    This program and the accompanying materials are made available under the 
+
+    This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v1.0 which accompanies this distribution,
     and is available at http://www.eclipse.org/legal/epl-v10.html.
-    
+
     Contributors:
         Gunnar Wagenknecht - initial API and implementation
  -->
 <plugin>
    <extension
-         point="org.eclipse.cloudfree.boot.serverroles">
+         point="org.eclipse.gyrex.boot.serverroles">
       <role
-            id="org.eclipse.cloudfree.examples.bugsearch"
+            id="org.eclipse.gyrex.examples.bugsearch"
             name="Eclipse Bug Search">
          <requireBundle
-               symbolicName="org.eclipse.cloudfree.examples.bugsearch">
+               symbolicName="org.eclipse.gyrex.examples.bugsearch">
          </requireBundle>
          <requireBundle
-               symbolicName="org.eclipse.cloudfree.cds.model.solr">
+               symbolicName="org.eclipse.gyrex.cds.model.solr">
          </requireBundle>
          <requireBundle
-               symbolicName="org.eclipse.cloudfree.cds.service.solr">
+               symbolicName="org.eclipse.gyrex.cds.service.solr">
          </requireBundle>
          <requireBundle
-               symbolicName="org.eclipse.cloudfree.persistence.solr">
+               symbolicName="org.eclipse.gyrex.persistence.solr">
          </requireBundle>
       </role>
    </extension>
    <extension
-         point="org.eclipse.cloudfree.admin.configuration.wizard">
+         point="org.eclipse.gyrex.admin.configuration.wizard">
       <step
-            class="org.eclipse.cloudfree.examples.bugsearch.internal.setup.FanShopSetupStep"
-            id="org.eclipse.cloudfree.examples.bugsearch.setup">
+            class="org.eclipse.gyrex.examples.bugsearch.internal.setup.FanShopSetupStep"
+            id="org.eclipse.gyrex.examples.bugsearch.setup">
       </step>
    </extension>
    <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="org.eclipse.cloudfree.boot.server"
-            name="CloudFree Bug Search">
+            application="org.eclipse.gyrex.boot.server"
+            name="Gyrex Bug Search">
       </product>
    </extension>
 

@@ -9,29 +9,29 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal.setup;
+package org.eclipse.gyrex.examples.bugsearch.internal.setup;
 
-import org.eclipse.cloudfree.admin.configuration.wizard.ConfigurationWizardStep;
-import org.eclipse.cloudfree.toolkit.CWT;
-import org.eclipse.cloudfree.toolkit.content.BooleanContent;
-import org.eclipse.cloudfree.toolkit.content.TextContent;
-import org.eclipse.cloudfree.toolkit.runtime.commands.CommandExecutionEvent;
-import org.eclipse.cloudfree.toolkit.widgets.Checkbox;
-import org.eclipse.cloudfree.toolkit.widgets.DialogFieldGroup;
-import org.eclipse.cloudfree.toolkit.widgets.DialogFieldRules;
-import org.eclipse.cloudfree.toolkit.widgets.TextInput;
-import org.eclipse.cloudfree.toolkit.wizard.WizardContainer;
-import org.eclipse.cloudfree.toolkit.wizard.WizardPage;
+import org.eclipse.gyrex.admin.configuration.wizard.ConfigurationWizardStep;
+import org.eclipse.gyrex.toolkit.CWT;
+import org.eclipse.gyrex.toolkit.content.BooleanContent;
+import org.eclipse.gyrex.toolkit.content.TextContent;
+import org.eclipse.gyrex.toolkit.runtime.commands.CommandExecutionEvent;
+import org.eclipse.gyrex.toolkit.widgets.Checkbox;
+import org.eclipse.gyrex.toolkit.widgets.DialogFieldGroup;
+import org.eclipse.gyrex.toolkit.widgets.DialogFieldRules;
+import org.eclipse.gyrex.toolkit.widgets.TextInput;
+import org.eclipse.gyrex.toolkit.wizard.WizardContainer;
+import org.eclipse.gyrex.toolkit.wizard.WizardPage;
 import org.osgi.service.prefs.BackingStoreException;
 
 public class FanShopSetupStep extends ConfigurationWizardStep {
 
 	public FanShopSetupStep() {
-		super("org.eclipse.cloudfree.examples.bugsearch.setup");
+		super("org.eclipse.gyrex.examples.bugsearch.setup");
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cloudfree.admin.configuration.wizard.ConfigurationWizardStep#createPages(org.eclipse.cloudfree.admin.configuration.wizard.WizardContainer)
+	 * @see org.eclipse.gyrex.admin.configuration.wizard.ConfigurationWizardStep#createPages(org.eclipse.gyrex.admin.configuration.wizard.WizardContainer)
 	 */
 	@Override
 	public void createPages(final WizardContainer wizard) {
@@ -48,7 +48,7 @@ public class FanShopSetupStep extends ConfigurationWizardStep {
 
 		final DialogFieldGroup container = new DialogFieldGroup("bugsearch-urls", wizardPage, CWT.NONE);
 		container.setTitle("Configuration");
-		container.setDescription("Configure the URL the Bug Search application should be deployed to. Please make sure the domain name actually resolves to the machine CloudFree is running on.");
+		container.setDescription("Configure the URL the Bug Search application should be deployed to. Please make sure the domain name actually resolves to the machine Gyrex is running on.");
 		//container.setVisibilityRule(DialogFieldRules.field(deploy).isSet());
 
 		final TextInput urlInput = new TextInput("bugsearch-url", container, CWT.NONE);
@@ -61,7 +61,7 @@ public class FanShopSetupStep extends ConfigurationWizardStep {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cloudfree.admin.configuration.wizard.ConfigurationWizardStep#wizardFinished(org.eclipse.cloudfree.admin.configuration.wizard.CommandExecutionEvent)
+	 * @see org.eclipse.gyrex.admin.configuration.wizard.ConfigurationWizardStep#wizardFinished(org.eclipse.gyrex.admin.configuration.wizard.CommandExecutionEvent)
 	 */
 	@Override
 	public boolean wizardFinished(final CommandExecutionEvent finishEvent) {

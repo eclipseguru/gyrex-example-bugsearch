@@ -9,14 +9,14 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal;
+package org.eclipse.gyrex.examples.bugsearch.internal;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.cloudfree.common.context.IContext;
-import org.eclipse.cloudfree.examples.bugsearch.internal.BugSearchDataImport.Mode;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchDataImport.Mode;
 
 /**
  * 
@@ -42,7 +42,7 @@ public class BugzillaUpdateScheduler {
 
 		initialImport = new BugSearchDataImport(context, Mode.INITIAL, interval, timeUnit) {
 			/* (non-Javadoc)
-			 * @see org.eclipse.cloudfree.examples.bugsearch.internal.BugSearchDataImport#run(org.eclipse.core.runtime.IProgressMonitor)
+			 * @see org.eclipse.gyrex.examples.bugsearch.internal.BugSearchDataImport#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
@@ -60,7 +60,7 @@ public class BugzillaUpdateScheduler {
 		}
 		update = new BugSearchDataImport(context, Mode.UPDATE, interval, timeUnit) {
 			/* (non-Javadoc)
-			 * @see org.eclipse.cloudfree.examples.bugsearch.internal.BugSearchDataImport#run(org.eclipse.core.runtime.IProgressMonitor)
+			 * @see org.eclipse.gyrex.examples.bugsearch.internal.BugSearchDataImport#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {

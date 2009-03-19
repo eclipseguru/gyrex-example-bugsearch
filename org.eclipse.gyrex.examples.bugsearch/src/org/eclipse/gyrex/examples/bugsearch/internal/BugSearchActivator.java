@@ -9,21 +9,21 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal;
+package org.eclipse.gyrex.examples.bugsearch.internal;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.cloudfree.common.logging.LogAudience;
-import org.eclipse.cloudfree.common.logging.LogImportance;
-import org.eclipse.cloudfree.common.logging.LogSource;
-import org.eclipse.cloudfree.common.runtime.BaseBundleActivator;
-import org.eclipse.cloudfree.common.services.IServiceProxy;
-import org.eclipse.cloudfree.examples.bugsearch.internal.app.BugSearchApplicationProvider;
-import org.eclipse.cloudfree.http.application.provider.ApplicationProvider;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.gyrex.common.logging.LogAudience;
+import org.eclipse.gyrex.common.logging.LogImportance;
+import org.eclipse.gyrex.common.logging.LogSource;
+import org.eclipse.gyrex.common.runtime.BaseBundleActivator;
+import org.eclipse.gyrex.common.services.IServiceProxy;
+import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
+import org.eclipse.gyrex.http.application.provider.ApplicationProvider;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class BugSearchActivator extends BaseBundleActivator {
 
-	public static final String PLUGIN_ID = "org.eclipse.cloudfree.examples.bugsearch";
+	public static final String PLUGIN_ID = "org.eclipse.gyrex.examples.bugsearch";
 
 	private static final AtomicReference<BugSearchActivator> instance = new AtomicReference<BugSearchActivator>();
 
@@ -58,7 +58,7 @@ public class BugSearchActivator extends BaseBundleActivator {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cloudfree.common.runtime.BaseBundleActivator#doStart(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.gyrex.common.runtime.BaseBundleActivator#doStart(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	protected void doStart(final BundleContext context) throws Exception {
@@ -68,7 +68,7 @@ public class BugSearchActivator extends BaseBundleActivator {
 		instanceLocationRef.set(getServiceHelper().trackService(Location.class, context.createFilter(Location.INSTANCE_FILTER)));
 
 		// register application provider
-		getServiceHelper().registerService(ApplicationProvider.class.getName(), new BugSearchApplicationProvider(), "CloudFree.net", "Application provider for the extensible Fan Shop application.", null, null);
+		getServiceHelper().registerService(ApplicationProvider.class.getName(), new BugSearchApplicationProvider(), "Gyrex.net", "Application provider for the extensible Fan Shop application.", null, null);
 
 		// create environment
 		new Job("Initializing Bug Search") {
@@ -90,7 +90,7 @@ public class BugSearchActivator extends BaseBundleActivator {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.cloudfree.common.runtime.BaseBundleActivator#doStop(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.gyrex.common.runtime.BaseBundleActivator#doStop(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	protected void doStop(final BundleContext context) throws Exception {

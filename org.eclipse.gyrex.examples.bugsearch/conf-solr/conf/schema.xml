@@ -12,7 +12,7 @@
  -->
  
 <!--
- This is the CloudFree Fanshop specific Solr index schema configuration file.
+ This is the Gyrex Fanshop specific Solr index schema configuration file.
   
  For more information, on how to customize this file, please see
  http://wiki.apache.org/solr/SchemaXml

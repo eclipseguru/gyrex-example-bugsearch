@@ -15,6 +15,6 @@
 	<inherits name='com.google.gwt.user.User'/>
 
 	<!-- Specify the app entry point class.                   -->
-	<entry-point class='org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.BugSearch'/>
+	<entry-point class='org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.BugSearch'/>
   
 </module>

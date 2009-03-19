@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service;
+package org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 

@@ -9,15 +9,15 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.widgets;
+package org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.BugSearch;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.BugSearchHistoryManager;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugListFilter;
-import org.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.BugSearch;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.BugSearchHistoryManager;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter;
+import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;

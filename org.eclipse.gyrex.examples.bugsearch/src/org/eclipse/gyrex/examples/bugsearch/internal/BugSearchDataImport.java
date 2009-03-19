@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal;
+package org.eclipse.gyrex.examples.bugsearch.internal;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -24,16 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
-import org.eclipse.cloudfree.cds.model.IListingManager;
-import org.eclipse.cloudfree.cds.model.documents.Document;
-import org.eclipse.cloudfree.cds.model.solr.internal.SolrListingsManager;
-import org.eclipse.cloudfree.common.context.IContext;
-import org.eclipse.cloudfree.common.debug.BundleDebug;
-import org.eclipse.cloudfree.configuration.PlatformConfiguration;
-import org.eclipse.cloudfree.configuration.preferences.PlatformScope;
-import org.eclipse.cloudfree.configuration.service.IConfigurationService;
-import org.eclipse.cloudfree.model.common.ModelUtil;
-import org.eclipse.cloudfree.persistence.solr.internal.SolrRepository;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -42,6 +32,16 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.gyrex.cds.model.IListingManager;
+import org.eclipse.gyrex.cds.model.documents.Document;
+import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
+import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.common.debug.BundleDebug;
+import org.eclipse.gyrex.configuration.PlatformConfiguration;
+import org.eclipse.gyrex.configuration.preferences.PlatformScope;
+import org.eclipse.gyrex.configuration.service.IConfigurationService;
+import org.eclipse.gyrex.model.common.ModelUtil;
+import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaAttribute;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaCorePlugin;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;

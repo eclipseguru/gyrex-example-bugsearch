@@ -9,35 +9,35 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.cloudfree.examples.bugsearch.internal.setup;
+package org.eclipse.gyrex.examples.bugsearch.internal.setup;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.cloudfree.common.debug.BundleDebug;
-import org.eclipse.cloudfree.configuration.PlatformConfiguration;
-import org.eclipse.cloudfree.configuration.preferences.PlatformScope;
-import org.eclipse.cloudfree.configuration.service.IConfigurationService;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.gyrex.common.debug.BundleDebug;
+import org.eclipse.gyrex.configuration.PlatformConfiguration;
+import org.eclipse.gyrex.configuration.preferences.PlatformScope;
+import org.eclipse.gyrex.configuration.service.IConfigurationService;
 import org.osgi.service.prefs.BackingStoreException;
 
 public class BugSearchDevSetup {
 
 	public static final String DEFAULT_URL = "http:///bugsearch/";
-	public static final String PLUGIN_ID_BUGSEARCH = "org.eclipse.cloudfree.examples.bugsearch";
+	public static final String PLUGIN_ID_BUGSEARCH = "org.eclipse.gyrex.examples.bugsearch";
 	public static final String URL = "url";
 
 	public static void enableServerRole() throws BackingStoreException {
 		// enable required server roles
-		//  - org.eclipse.cloudfree.boot.role.admin.gwt
-		//  - org.eclipse.cloudfree.boot.role.http.registry
-		//  - org.eclipse.cloudfree.boot.role.http.jetty
-		//  - org.eclipse.cloudfree.examples.bugsearch
+		//  - org.eclipse.gyrex.boot.role.admin.gwt
+		//  - org.eclipse.gyrex.boot.role.http.registry
+		//  - org.eclipse.gyrex.boot.role.http.jetty
+		//  - org.eclipse.gyrex.examples.bugsearch
 		try {
-			final IEclipsePreferences preferences = new PlatformScope().getNode("org.eclipse.cloudfree.boot");
+			final IEclipsePreferences preferences = new PlatformScope().getNode("org.eclipse.gyrex.boot");
 			String roles = preferences.get("rolesToStart", "");
 			if (StringUtils.isNotBlank(roles)) {
 				roles += ",";
 			}
-			roles += "org.eclipse.cloudfree.boot.role.admin.gwt,org.eclipse.cloudfree.boot.role.http.registry,org.eclipse.cloudfree.boot.role.http.jetty,org.eclipse.cloudfree.examples.bugsearch";
+			roles += "org.eclipse.gyrex.boot.role.admin.gwt,org.eclipse.gyrex.boot.role.http.registry,org.eclipse.gyrex.boot.role.http.jetty,org.eclipse.gyrex.examples.bugsearch";
 			preferences.put("rolesToStart", roles);
 			preferences.flush();
 		} catch (final Exception e) {
