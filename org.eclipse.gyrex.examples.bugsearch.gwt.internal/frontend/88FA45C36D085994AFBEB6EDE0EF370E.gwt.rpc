@@ -16,6 +16,6 @@ org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug, true
 org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugList, true
 org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter, true
 org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue, true
-[Lorg.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;, true
-[Lorg.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.BugListFilter;, true
-[Lorg.eclipse.cloudfree.examples.bugsearch.gwt.internal.client.service.Bug;, true
+[Lorg.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;, true
+[Lorg.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter;, true
+[Lorg.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug;, true
