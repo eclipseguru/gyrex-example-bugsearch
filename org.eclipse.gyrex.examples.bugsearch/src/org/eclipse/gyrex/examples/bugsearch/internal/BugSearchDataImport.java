@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
@@ -62,7 +62,7 @@ public class BugSearchDataImport extends Job {
 	private static final class DocumentsPublisher extends TaskDataCollector {
 
 		/**
-		 * 
+		 *
 		 */
 		private final class PublishTaskRunnable implements Runnable {
 			/** taskId */
@@ -346,13 +346,14 @@ public class BugSearchDataImport extends Job {
 		connector.performQuery(repository, query, publisher, null, monitor);
 	}
 
-	/**
-	 * @param monitor
-	 * @param repository
-	 * @param connector
-	 * @param publisher
-	 */
 	private void queryForAllBugs(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
+		// for demo purposes we'll fetch only a few bugs in dev mode
+		if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
+			final String url = "https://bugs.eclipse.org/bugs/buglist.cgi?field0-0-0=bug_id&type0-0-0=lessthan&value0-0-0=100&field0-1-0=bug_id&type0-1-0=greaterthan&value0-1-0=0&order=Bug+Number";
+			queryByUrl(monitor, repository, connector, publisher, url);
+			return;
+		}
+
 		final IConfigurationService configurationService = PlatformConfiguration.getConfigurationService();
 		int start = configurationService.getInt(BugSearchActivator.PLUGIN_ID, "import.start", 0, getContext());
 		int oldBugsCount = 0;

@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
@@ -44,7 +44,7 @@ public class FanShopSetupStep extends ConfigurationWizardStep {
 		enableFanShopGroup.setDescription("Select whether the Bug Search application should be deployed.");
 
 		final Checkbox deploy = new Checkbox("bugsearch-deploy", enableFanShopGroup, CWT.NONE);
-		deploy.setLabel("Deploy the Eclipse FanShop demo application.");
+		deploy.setLabel("Deploy the Eclipse Bug Search demo application.");
 
 		final DialogFieldGroup container = new DialogFieldGroup("bugsearch-urls", wizardPage, CWT.NONE);
 		container.setTitle("Configuration");
