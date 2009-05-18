@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
@@ -13,18 +13,11 @@ package org.eclipse.gyrex.examples.bugsearch.internal;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.gyrex.common.logging.LogAudience;
-import org.eclipse.gyrex.common.logging.LogImportance;
-import org.eclipse.gyrex.common.logging.LogSource;
 import org.eclipse.gyrex.common.runtime.BaseBundleActivator;
 import org.eclipse.gyrex.common.services.IServiceProxy;
+import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
 import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
 import org.eclipse.gyrex.http.application.provider.ApplicationProvider;
-import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.packageadmin.PackageAdmin;
@@ -44,11 +37,9 @@ public class BugSearchActivator extends BaseBundleActivator {
 		return fanShopActivator;
 	}
 
-	private volatile BugSearchRTSetup fanShopRTSetup;
-
 	private ServiceTracker bundleTracker;
 
-	private final AtomicReference<IServiceProxy<Location>> instanceLocationRef = new AtomicReference<IServiceProxy<Location>>();
+	private IServiceProxy<IRuntimeContextRegistry> contextRegistry;
 
 	/**
 	 * Creates a new instance.
@@ -64,29 +55,11 @@ public class BugSearchActivator extends BaseBundleActivator {
 	protected void doStart(final BundleContext context) throws Exception {
 		instance.set(this);
 
-		// get instance location
-		instanceLocationRef.set(getServiceHelper().trackService(Location.class, context.createFilter(Location.INSTANCE_FILTER)));
+		// track the context registry
+		contextRegistry = getServiceHelper().trackService(IRuntimeContextRegistry.class);
 
 		// register application provider
 		getServiceHelper().registerService(ApplicationProvider.class.getName(), new BugSearchApplicationProvider(), "Gyrex.net", "Application provider for the extensible Fan Shop application.", null, null);
-
-		// create environment
-		new Job("Initializing Bug Search") {
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
-				try {
-					fanShopRTSetup = new BugSearchRTSetup(BugSearchActivator.getInstance().getBundle().getBundleContext());
-					fanShopRTSetup.runtimeSetup();
-				} catch (final IllegalStateException e) {
-					// already shutdown
-					return Status.CANCEL_STATUS;
-				} catch (final Exception e) {
-					getLog().log("Error during bug search initialization!", e, (Object) null, LogImportance.ERROR, LogAudience.DEVELOPER, LogAudience.ADMIN, LogSource.APPLICATION);
-					return Status.CANCEL_STATUS;
-				}
-				return Status.OK_STATUS;
-			}
-		}.schedule();
 	}
 
 	/* (non-Javadoc)
@@ -96,7 +69,6 @@ public class BugSearchActivator extends BaseBundleActivator {
 	protected void doStop(final BundleContext context) throws Exception {
 		BugzillaUpdateScheduler.cancelUpdateJob();
 		instance.set(null);
-		fanShopRTSetup.close();
 	}
 
 	public Bundle getBundle(final String symbolicName) {
@@ -129,12 +101,11 @@ public class BugSearchActivator extends BaseBundleActivator {
 		return (PackageAdmin) bundleTracker.getService();
 	}
 
-	public Location getInstanceLocation() {
-		final IServiceProxy<Location> serviceProxy = instanceLocationRef.get();
-		if (null == serviceProxy) {
+	public IServiceProxy<IRuntimeContextRegistry> getContextRegistry() {
+		final IServiceProxy<IRuntimeContextRegistry> proxy = contextRegistry;
+		if (null == proxy) {
 			throw createBundleInactiveException();
 		}
-
-		return serviceProxy.getService();
+		return proxy;
 	}
 }

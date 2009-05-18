@@ -18,7 +18,7 @@ import org.eclipse.gyrex.configuration.PlatformConfiguration;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
-import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchRTSetup;
+import org.eclipse.gyrex.examples.bugsearch.internal.IEclipseBugSearchConstants;
 import org.eclipse.gyrex.http.application.Application;
 import org.eclipse.gyrex.http.registry.internal.BundleResourceProvider;
 import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
@@ -48,11 +48,11 @@ public class BugSearchApplication extends Application {
 
 			// let's expose the Solr admin interface in dev mode
 			if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
-				getApplicationServiceSupport().registerServlet("/solr/admin/*.jsp", new SolrAdminJspServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), BugSearchRTSetup.REPOSITORY_ID), null);
+				getApplicationServiceSupport().registerServlet("/solr/admin/*.jsp", new SolrAdminJspServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
 				getApplicationServiceSupport().registerResources("/solr", "web", new BundleResourceProvider(BugSearchActivator.getInstance().getBundle("org.apache.solr.servlet")));
 
 				// let's expose the Solr request handler
-				getApplicationServiceSupport().registerServlet("/solr/select", new SolrServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), BugSearchRTSetup.REPOSITORY_ID), null);
+				getApplicationServiceSupport().registerServlet("/solr/select", new SolrServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
 
 			}
 		} catch (final ServletException e) {

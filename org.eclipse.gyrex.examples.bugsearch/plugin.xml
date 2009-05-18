@@ -34,7 +34,7 @@
    <extension
          point="org.eclipse.gyrex.admin.configuration.wizard">
       <step
-            class="org.eclipse.gyrex.examples.bugsearch.internal.setup.FanShopSetupStep"
+            class="org.eclipse.gyrex.examples.bugsearch.internal.setup.BugSearchSetupStep"
             id="org.eclipse.gyrex.examples.bugsearch.setup">
       </step>
    </extension>

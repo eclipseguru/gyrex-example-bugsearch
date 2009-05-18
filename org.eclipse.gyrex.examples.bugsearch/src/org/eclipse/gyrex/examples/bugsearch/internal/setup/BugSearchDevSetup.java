@@ -13,20 +13,16 @@ package org.eclipse.gyrex.examples.bugsearch.internal.setup;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.gyrex.configuration.PlatformConfiguration;
-import org.eclipse.gyrex.configuration.service.IConfigurationService;
 import org.eclipse.gyrex.preferences.PlatformScope;
 import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// note, this package does not trigger bundle activation
+// we must be careful to not reference classes (even constants) outside this package
 public class BugSearchDevSetup {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BugSearchDevSetup.class);
-
-	public static final String DEFAULT_URL = "http:///bugsearch/";
-	public static final String PLUGIN_ID_BUGSEARCH = "org.eclipse.gyrex.examples.bugsearch";
-	public static final String URL = "url";
 
 	public static void enableServerRole() throws BackingStoreException {
 		// enable required server roles
@@ -46,12 +42,6 @@ public class BugSearchDevSetup {
 		} catch (final Exception e) {
 			LOG.error("Error while activating required server roles. " + e.getMessage(), e);
 		}
-	}
-
-	public static void setFanShopUrl(final String url) throws BackingStoreException {
-		final IConfigurationService configurationService = PlatformConfiguration.getConfigurationService();
-		configurationService.putString(PLUGIN_ID_BUGSEARCH, URL, url, null, false);
-		new PlatformScope().getNode(PLUGIN_ID_BUGSEARCH).flush();
 	}
 
 	private BugSearchDevSetup() {
