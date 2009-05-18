@@ -13,7 +13,7 @@ package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.http.application.Application;
 import org.eclipse.gyrex.http.application.provider.ApplicationProvider;
@@ -35,10 +35,10 @@ public class BugSearchApplicationProvider extends ApplicationProvider {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.gyrex.http.application.provider.ApplicationProvider#createApplication(java.lang.String, org.eclipse.gyrex.common.context.IContext)
+	 * @see org.eclipse.gyrex.http.application.provider.ApplicationProvider#createApplication(java.lang.String, org.eclipse.gyrex.context.IRuntimeContext)
 	 */
 	@Override
-	public Application createApplication(final String applicationId, final IContext context) throws CoreException {
+	public Application createApplication(final String applicationId, final IRuntimeContext context) throws CoreException {
 		return new BugSearchApplication(applicationId, context);
 	}
 

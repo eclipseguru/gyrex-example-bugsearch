@@ -35,13 +35,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.documents.Document;
 import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
-import org.eclipse.gyrex.common.context.IContext;
-import org.eclipse.gyrex.common.debug.BundleDebug;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
-import org.eclipse.gyrex.configuration.preferences.PlatformScope;
 import org.eclipse.gyrex.configuration.service.IConfigurationService;
+import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
+import org.eclipse.gyrex.preferences.PlatformScope;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaAttribute;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaCorePlugin;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
@@ -55,6 +54,8 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("restriction")
 public class BugSearchDataImport extends Job {
@@ -82,6 +83,8 @@ public class BugSearchDataImport extends Job {
 				publishTask(taskId);
 			}
 		}
+
+		private static final Logger LOG = LoggerFactory.getLogger(BugSearchDataImport.DocumentsPublisher.class);
 
 		/** connector */
 		private final BugzillaRepositoryConnector connector;
@@ -162,11 +165,7 @@ public class BugSearchDataImport extends Job {
 					throw new OperationCanceledException();
 				}
 
-				BundleDebug.print("bug " + taskId);
-
 				final TaskData taskData = connector.getTaskData(taskRepository, taskId, new NullProgressMonitor());
-
-				BundleDebug.print(".");
 
 				// access task information
 				final ITaskMapping taskMapping = connector.getTaskMapping(taskData);
@@ -227,10 +226,8 @@ public class BugSearchDataImport extends Job {
 
 				repository.add(document);
 
-				BundleDebug.debug(".");
-
 			} catch (final CoreException e) {
-				BundleDebug.debug("error while fetching bug data", e);
+				LOG.error("error while fetching bug data", e);
 			} finally {
 				openTasks.decrementAndGet();
 			}
@@ -298,11 +295,13 @@ public class BugSearchDataImport extends Job {
 		}
 	}
 
+	private static final Logger LOG = LoggerFactory.getLogger(BugSearchDataImport.class);
+
 	public static final String NOW = "Now";
 
 	private static final String URL = "https://bugs.eclipse.org/bugs/";
 
-	private final IContext context;
+	private final IRuntimeContext context;
 
 	private final Mode mode;
 
@@ -316,7 +315,7 @@ public class BugSearchDataImport extends Job {
 	 * @param context
 	 * @param name
 	 */
-	BugSearchDataImport(final IContext context, final Mode mode, final long interval, final TimeUnit unit) {
+	BugSearchDataImport(final IRuntimeContext context, final Mode mode, final long interval, final TimeUnit unit) {
 		super("fan shop data import");
 		this.context = context;
 		this.mode = mode;
@@ -331,7 +330,7 @@ public class BugSearchDataImport extends Job {
 	 * 
 	 * @return the context
 	 */
-	public IContext getContext() {
+	public IRuntimeContext getContext() {
 		return context;
 	}
 
@@ -425,7 +424,7 @@ public class BugSearchDataImport extends Job {
 				// finish publishing
 				publisher.shutdown();
 
-				BundleDebug.debug("Published " + publisher.getBugsCount() + " bugs.");
+				LOG.debug("Published " + publisher.getBugsCount() + " bugs.");
 
 				// commit
 				solrRepository.commit(true, false);

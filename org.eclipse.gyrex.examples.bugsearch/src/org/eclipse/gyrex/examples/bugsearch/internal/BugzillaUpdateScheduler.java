@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchDataImport.Mode;
 
 /**
@@ -35,7 +35,7 @@ public class BugzillaUpdateScheduler {
 		update = null;
 	}
 
-	public static synchronized void scheduleInitialImportFollowedByUpdate(final IContext context, final long interval, final TimeUnit timeUnit) {
+	public static synchronized void scheduleInitialImportFollowedByUpdate(final IRuntimeContext context, final long interval, final TimeUnit timeUnit) {
 		if (null != initialImport) {
 			return;
 		}
@@ -54,7 +54,7 @@ public class BugzillaUpdateScheduler {
 		initialImport.schedule();
 	}
 
-	public static synchronized void scheduleUpdateJob(final IContext context, final long interval, final TimeUnit timeUnit) {
+	public static synchronized void scheduleUpdateJob(final IRuntimeContext context, final long interval, final TimeUnit timeUnit) {
 		if (null != update) {
 			return;
 		}

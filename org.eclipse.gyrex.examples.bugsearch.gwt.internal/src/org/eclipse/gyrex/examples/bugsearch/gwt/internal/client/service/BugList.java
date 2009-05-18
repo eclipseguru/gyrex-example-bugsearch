@@ -1,16 +1,17 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
 package org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 /**
  * The bug list.
  */
-public class BugList implements IsSerializable {
+public class BugList implements IsSerializable, Serializable {
+
+	/** serialVersionUID */
+	private static final long serialVersionUID = -3052679621251161135L;
 
 	private long numFound;
 	private long queryTime;
@@ -37,10 +41,6 @@ public class BugList implements IsSerializable {
 		bugs.add(bug);
 	}
 
-	/**
-	 * @param id
-	 * @param label
-	 */
 	public void addFilter(final BugListFilter filter) {
 		if (null == filters) {
 			filters = new ArrayList<BugListFilter>();
@@ -105,16 +105,10 @@ public class BugList implements IsSerializable {
 		this.activeFilters = activeFilters;
 	}
 
-	/**
-	 * @param numFound
-	 */
 	public void setNumFound(final long numFound) {
 		this.numFound = numFound;
 	}
 
-	/**
-	 * @param queryTime
-	 */
 	public void setQueryTime(final long queryTime) {
 		this.queryTime = queryTime;
 	}

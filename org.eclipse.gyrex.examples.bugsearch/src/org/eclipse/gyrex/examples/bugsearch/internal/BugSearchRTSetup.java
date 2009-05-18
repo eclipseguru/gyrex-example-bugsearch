@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -27,15 +26,11 @@ import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
-import org.eclipse.gyrex.configuration.preferences.PlatformScope;
 import org.eclipse.gyrex.configuration.service.IConfigurationService;
-import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
 import org.eclipse.gyrex.examples.bugsearch.internal.setup.BugSearchDevSetup;
-import org.eclipse.gyrex.http.application.manager.ApplicationRegistrationException;
 import org.eclipse.gyrex.http.application.manager.IApplicationManager;
-import org.eclipse.gyrex.http.application.manager.MountConflictException;
-import org.eclipse.gyrex.http.internal.apps.dummy.RootContext;
 import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
+import org.eclipse.gyrex.preferences.PlatformScope;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
@@ -150,23 +145,23 @@ public class BugSearchRTSetup {
 			public Object addingService(final ServiceReference reference) {
 				final IApplicationManager applicationManager = (IApplicationManager) super.addingService(reference);
 				if (null != applicationManager) {
-					try {
-						applicationManager.register(APPLICATION_ID, BugSearchApplicationProvider.ID, new RootContext(), null);
-					} catch (final ApplicationRegistrationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						final String url = PlatformConfiguration.getConfigurationService().getString(BugSearchDevSetup.PLUGIN_ID_BUGSEARCH, BugSearchDevSetup.URL, BugSearchDevSetup.DEFAULT_URL, null);
-						applicationManager.mount(url, APPLICATION_ID);
-					} catch (final MountConflictException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (final MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					//					try {
+					//						applicationManager.register(APPLICATION_ID, BugSearchApplicationProvider.ID, new RootContext(), null);
+					//					} catch (final ApplicationRegistrationException e) {
+					//						// TODO Auto-generated catch block
+					//						e.printStackTrace();
+					//					}
+					//
+					//					try {
+					//						final String url = PlatformConfiguration.getConfigurationService().getString(BugSearchDevSetup.PLUGIN_ID_BUGSEARCH, BugSearchDevSetup.URL, BugSearchDevSetup.DEFAULT_URL, null);
+					//						applicationManager.mount(url, APPLICATION_ID);
+					//					} catch (final MountConflictException e) {
+					//						// TODO Auto-generated catch block
+					//						e.printStackTrace();
+					//					} catch (final MalformedURLException e) {
+					//						// TODO Auto-generated catch block
+					//						e.printStackTrace();
+					//					}
 				}
 				return applicationManager;
 			}
@@ -198,30 +193,24 @@ public class BugSearchRTSetup {
 	}
 
 	public void runtimeSetup() throws Exception {
-		final boolean created = initializeSolrCore();
-		configureRepositories();
-		registerApplication();
-
-		final RootContext rootContext = new RootContext();
-
-		// reset import counter
-		if (created) {
-			PlatformConfiguration.getConfigurationService().remove(BugSearchActivator.PLUGIN_ID, "import.start", rootContext);
-			try {
-				new PlatformScope().getNode(BugSearchActivator.PLUGIN_ID).flush();
-			} catch (final BackingStoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		BugzillaUpdateScheduler.scheduleInitialImportFollowedByUpdate(rootContext, 1, TimeUnit.HOURS);
-
+		//		final boolean created = initializeSolrCore();
+		//		configureRepositories();
+		//		registerApplication();
+		//
+		//		final RootContext rootContext = new RootContext();
+		//
+		//		// reset import counter
 		//		if (created) {
-		//			BugzillaUpdateScheduler.scheduleInitialImportFollowedByUpdate(new RootContext(), 1, TimeUnit.HOURS);
-		//		} else {
-		//			BugzillaUpdateScheduler.scheduleUpdateJob(new RootContext(), 1, TimeUnit.HOURS);
+		//			PlatformConfiguration.getConfigurationService().remove(BugSearchActivator.PLUGIN_ID, "import.start", rootContext);
+		//			try {
+		//				new PlatformScope().getNode(BugSearchActivator.PLUGIN_ID).flush();
+		//			} catch (final BackingStoreException e) {
+		//				// TODO Auto-generated catch block
+		//				e.printStackTrace();
+		//			}
 		//		}
+		//
+		//		BugzillaUpdateScheduler.scheduleInitialImportFollowedByUpdate(rootContext, 1, TimeUnit.HOURS);
 	}
 
 }

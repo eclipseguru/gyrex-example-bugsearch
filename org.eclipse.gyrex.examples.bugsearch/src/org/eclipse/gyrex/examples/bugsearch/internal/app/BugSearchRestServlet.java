@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
@@ -21,7 +21,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -46,7 +45,7 @@ import org.eclipse.gyrex.cds.service.query.ListingQuery.SortDirection;
 import org.eclipse.gyrex.cds.service.result.IListingResult;
 import org.eclipse.gyrex.cds.service.result.IListingResultFacet;
 import org.eclipse.gyrex.cds.service.result.IListingResultFacetValue;
-import org.eclipse.gyrex.common.context.IContext;
+import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.http.application.ApplicationException;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.services.common.ServiceUtil;
@@ -55,7 +54,10 @@ import com.ibm.icu.text.MeasureFormat;
 import com.ibm.icu.util.CurrencyAmount;
 import com.ibm.icu.util.ULocale;
 
-public class JsonListingServlet extends HttpServlet {
+/**
+ * A service for delivering bugs in a rest style approach
+ */
+public class BugSearchRestServlet extends HttpServlet {
 
 	static interface Enhancer {
 		void enhanceWithinObject(JsonGenerator json) throws IOException;
@@ -82,14 +84,14 @@ public class JsonListingServlet extends HttpServlet {
 		return builder;
 	}
 
-	private final IContext context;
+	private final IRuntimeContext context;
 
 	/**
 	 * Creates a new instance.
 	 * 
 	 * @param context
 	 */
-	public JsonListingServlet(final IContext context) {
+	public BugSearchRestServlet(final IRuntimeContext context) {
 		this.context = context;
 	}
 
@@ -146,7 +148,7 @@ public class JsonListingServlet extends HttpServlet {
 
 		final IListingService listingService = ServiceUtil.getService(IListingService.class, getContext());
 		final ListingQuery query = new ListingQuery();
-		boolean isSingleListing = false;
+		boolean isSingle = false;
 
 		final String path = req.getPathInfo();
 		if ((null != path) && (path.length() > 1)) {
@@ -163,7 +165,7 @@ public class JsonListingServlet extends HttpServlet {
 			}
 			query.setResultDimension(ResultDimension.FULL);
 			query.setMaxResults(1);
-			isSingleListing = true;
+			isSingle = true;
 		} else {
 			final String q = req.getParameter("q");
 			if (StringUtils.isNotBlank(q)) {
@@ -226,45 +228,20 @@ public class JsonListingServlet extends HttpServlet {
 		}
 
 		final IListingResult result = listingService.findListings(query);
-
-		//		final Future<IListingResult> findListings = listingService.findListings(query, null);
-		//		IListingResult result;
-		//		try {
-		//			result = findListings.get(8, TimeUnit.SECONDS);
-		//		} catch (final InterruptedException e) {
-		//			Thread.currentThread().interrupt();
-		//			throw new ApplicationException(503, "Server Too Busy");
-		//		} catch (final TimeoutException e) {
-		//			throw new ApplicationException(503, "Server Too Busy");
-		//		} catch (final Exception e) {
-		//			throw new ApplicationException(e);
-		//		}
 		if (null == result) {
-			resp.sendError(404);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
-		//resp.setContentType("application/json");
-		if (req.getParameter("text") != null) {
-			resp.setContentType("text/plain");
+		final String format = req.getParameter("fmt");
+		if (StringUtils.isBlank(format) || StringUtils.equals("json", format)) {
+			writeJson(req, resp, isSingle, result);
+		} else if (StringUtils.equals("php", format)) {
+			writePhp(req, resp, isSingle, result);
 		} else {
-			resp.setContentType("application/json");
-		}
-		resp.setCharacterEncoding("UTF-8");
-
-		final PrintWriter writer = resp.getWriter();
-		final JsonGenerator json = new JsonFactory().createJsonGenerator(writer);
-		if (req.getParameter("text") != null) {
-			json.useDefaultPrettyPrinter();
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 
-		if (isSingleListing) {
-			writeSingleProductResult(result, json, req);
-		} else {
-			writeProductsResult(result, json, req);
-		}
-
-		json.close();
 	}
 
 	/**
@@ -278,16 +255,16 @@ public class JsonListingServlet extends HttpServlet {
 		resp.setContentType("text/plain");
 		resp.setCharacterEncoding("UTF-8");
 		final PrintWriter writer = resp.getWriter();
-		writer.println("JSON Servlet Usage");
+		writer.println("REST Servlet Usage");
 		writer.println("==================");
 		writer.println();
-		writer.print("    Retrieve all products: ");
+		writer.print("    Retrieve all bugs: ");
 		writer.println(getBaseUrl(req));
-		writer.print("Retrieve a single product: ");
+		writer.print("Retrieve a single bug: ");
 		writer.println(getBaseUrl(req).append("<uripath>"));
-		writer.print("                       or: ");
+		writer.print("                   or: ");
 		writer.println(getBaseUrl(req).append(ID_PATH_PREFIX.substring(1)).append("<id>"));
-		writer.print("    Perform auto complete: ");
+		writer.print("Perform auto complete: ");
 		writer.println(getBaseUrl(req).append(AUTOCOMPLETE_PATH_PREFIX.substring(1)).append("<autocompleteterm>"));
 		writer.println();
 		writer.println();
@@ -298,19 +275,10 @@ public class JsonListingServlet extends HttpServlet {
 		writer.println("      (see JavaDoc of org.eclipse.gyrex.cds.service.query.ListingQuery#setQuery(String))");
 		writer.println("f ... a filter query (multiple possible, will be interpreted as AND; ..&f=..&f=..)");
 		writer.println("      (eg. the facet 'filter' attribute from the result set)");
-		writer.println("c ... easy retrieval of a category (multiple possible, will be interpreted as AND; ..&c=shirts&c=underwear)");
-		writer.println("      (to filter for categories using OR use a filter \"..&f=+category:(shirts underwear)\")");
 		writer.println("s ... start index (zero-based, used for paging)");
 		writer.println("r ... rows to return (defaults to 10, used for paging)");
-		writer.println("t ... easy retrieval of a tag (multiple possible, will be interpreted as AND; ..&t=shirts&t=cool)");
-		writer.println("      (to filter for tags using OR use a filter \"..&f=+tags:(shirts cool)\")");
-		writer.println();
-		writer.println();
-		writer.println("Variations");
-		writer.println("----------");
-		writer.println();
-		writer.println("To keep things simple, variations are not searched by default. They should only be relevant");
-		writer.println("on product details pages. Thus, they are available in the product details information.");
+		writer.println("t ... easy retrieval of a tag (multiple possible, will be interpreted as AND; ..&t=eclipse&t=helpwanted)");
+		writer.println("      (to filter for tags using OR use a filter \"..&f=+tags:(eclipse helpwanted)\")");
 		writer.println();
 		writer.println();
 		writer.println("Debug Parameters");
@@ -318,6 +286,13 @@ public class JsonListingServlet extends HttpServlet {
 		writer.println();
 		writer.println("help ... print this help text");
 		writer.println("text ... send response as plain/text");
+		writer.println();
+		writer.println();
+		writer.println("Output Parameters");
+		writer.println("-----------------");
+		writer.println();
+		writer.println("fmt ... the desired output format; currently supported are 'json' (default) and 'php'");
+		writer.println();
 		writer.flush();
 	}
 
@@ -326,7 +301,7 @@ public class JsonListingServlet extends HttpServlet {
 	 * 
 	 * @return the context
 	 */
-	public IContext getContext() {
+	public IRuntimeContext getContext() {
 		return context;
 	}
 
@@ -334,11 +309,11 @@ public class JsonListingServlet extends HttpServlet {
 		json.writeStartObject();
 
 		writeValue("version", "1.0", json);
-		writeValue("type", "application/x-gyrex-fanshop-autocomplete-json", json);
+		writeValue("type", "application/x-gyrex-bugsearch-autocomplete-json", json);
 
 		writeValue("queryTime", response.getQTime(), json);
 
-		json.writeFieldName("products");
+		json.writeFieldName("bugs");
 		json.writeStartArray();
 		final SolrDocumentList results = response.getResults();
 		for (final SolrDocument solrDocument : results) {
@@ -379,7 +354,30 @@ public class JsonListingServlet extends HttpServlet {
 		json.writeEndObject();
 	}
 
-	private void writeProduct(final IListing listing, final JsonGenerator json, final HttpServletRequest req, final Enhancer enhancer) throws IOException {
+	private void writeJson(final HttpServletRequest req, final HttpServletResponse resp, final boolean isSingle, final IListingResult result) throws IOException {
+		if (req.getParameter("text") != null) {
+			resp.setContentType("text/plain");
+		} else {
+			resp.setContentType("application/json");
+		}
+		resp.setCharacterEncoding("UTF-8");
+
+		final PrintWriter writer = resp.getWriter();
+		final JsonGenerator json = new JsonFactory().createJsonGenerator(writer);
+		if (req.getParameter("text") != null) {
+			json.useDefaultPrettyPrinter();
+		}
+
+		if (isSingle) {
+			writeJsonSingleBugResult(result, json, req);
+		} else {
+			writeJsonBugResult(result, json, req);
+		}
+
+		json.close();
+	}
+
+	private void writeJsonBug(final IListing listing, final JsonGenerator json, final HttpServletRequest req, final Enhancer enhancer) throws IOException {
 		if (null == listing) {
 			return;
 		}
@@ -436,11 +434,11 @@ public class JsonListingServlet extends HttpServlet {
 		json.writeEndObject();
 	}
 
-	private void writeProductsResult(final IListingResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
+	private void writeJsonBugResult(final IListingResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
 		json.writeStartObject();
 
 		writeValue("version", "1.0", json);
-		writeValue("type", "application/x-gyrex-fanshop-products-json", json);
+		writeValue("type", "application/x-gyrex-bugsearch-bugs-json", json);
 
 		json.writeFieldName("query");
 		writeQuery(result.getQuery(), json);
@@ -456,14 +454,88 @@ public class JsonListingServlet extends HttpServlet {
 		}
 		json.writeEndArray();
 
-		json.writeFieldName("products");
+		json.writeFieldName("bugs");
 		json.writeStartArray();
 		for (final IListing listing : result.getListings()) {
-			writeProduct(listing, json, req, null);
+			writeJsonBug(listing, json, req, null);
 		}
 		json.writeEndArray();
 
 		json.writeEndObject();
+	}
+
+	private void writeJsonSingleBugResult(final IListingResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
+		json.writeStartObject();
+
+		writeValue("version", "1.0", json);
+		writeValue("type", "application/x-gyrex-bugsearch-bug-json", json);
+
+		json.writeFieldName("query");
+		writeQuery(result.getQuery(), json);
+
+		writeValue("queryTime", result.getQueryTime(), json);
+		//writeValue("numFound", result.getNumFound(), json);
+		//writeValue("startOffset", result.getStartOffset(), json);
+
+		final IListing[] listings = result.getListings();
+		if (listings.length == 1) {
+			json.writeFieldName("bug");
+			final IListing bug = listings[0];
+			writeJsonBug(bug, json, req, new Enhancer() {
+
+				@Override
+				public void enhanceWithinObject(final JsonGenerator json) throws IOException {
+					final String bugType = (String) bug.getAttribute("type").getValues()[0];
+					if ("variable-bug".equals(bugType)) {
+						final Object[] variationids = bug.getAttribute("variationids").getValues();
+						json.writeFieldName("variations");
+						json.writeStartObject();
+						final IListingManager manager = ModelUtil.getManager(IListingManager.class, getContext());
+						for (final Object variationId : variationids) {
+							final IListing variation = manager.findById((String) variationId);
+							if (null != variation) {
+								json.writeFieldName((String) variationId);
+								writeJsonBug(variation, json, req, null);
+							}
+						}
+						json.writeEndObject();
+					} else if ("variation".equals(bugType)) {
+						final String masterid = (String) bug.getAttribute("parentid").getValues()[0];
+						final IListingManager manager = ModelUtil.getManager(IListingManager.class, getContext());
+						final IListing master = manager.findById(masterid);
+						if (null != master) {
+							json.writeFieldName("master");
+							writeJsonBug(master, json, req, null);
+						}
+					}
+				}
+			});
+		}
+
+		json.writeEndObject();
+	}
+
+	private void writePhp(final HttpServletRequest req, final HttpServletResponse resp, final boolean isSingle, final IListingResult result) throws IOException {
+		if (req.getParameter("text") != null) {
+			resp.setContentType("text/plain");
+		} else {
+			resp.setContentType("application/json");
+		}
+		resp.setCharacterEncoding("UTF-8");
+
+		final PrintWriter writer = resp.getWriter();
+		final JsonGenerator json = new JsonFactory().createJsonGenerator(writer);
+		if (req.getParameter("text") != null) {
+			json.useDefaultPrettyPrinter();
+		}
+
+		if (isSingle) {
+			writeJsonSingleBugResult(result, json, req);
+		} else {
+			writeJsonBugResult(result, json, req);
+		}
+
+		json.close();
 	}
 
 	private void writeQuery(final ListingQuery query, final JsonGenerator json) throws IOException {
@@ -517,57 +589,6 @@ public class JsonListingServlet extends HttpServlet {
 			default:
 				json.writeString("compact");
 				break;
-		}
-
-		json.writeEndObject();
-	}
-
-	private void writeSingleProductResult(final IListingResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
-		json.writeStartObject();
-
-		writeValue("version", "1.0", json);
-		writeValue("type", "application/x-gyrex-fanshop-product-json", json);
-
-		json.writeFieldName("query");
-		writeQuery(result.getQuery(), json);
-
-		writeValue("queryTime", result.getQueryTime(), json);
-		//writeValue("numFound", result.getNumFound(), json);
-		//writeValue("startOffset", result.getStartOffset(), json);
-
-		final IListing[] listings = result.getListings();
-		if (listings.length == 1) {
-			json.writeFieldName("product");
-			final IListing product = listings[0];
-			writeProduct(product, json, req, new Enhancer() {
-
-				@Override
-				public void enhanceWithinObject(final JsonGenerator json) throws IOException {
-					final String productType = (String) product.getAttribute("type").getValues()[0];
-					if ("variable-product".equals(productType)) {
-						final Object[] variationids = product.getAttribute("variationids").getValues();
-						json.writeFieldName("variations");
-						json.writeStartObject();
-						final IListingManager manager = ModelUtil.getManager(IListingManager.class, getContext());
-						for (final Object variationId : variationids) {
-							final IListing variation = manager.findById((String) variationId);
-							if (null != variation) {
-								json.writeFieldName((String) variationId);
-								writeProduct(variation, json, req, null);
-							}
-						}
-						json.writeEndObject();
-					} else if ("variation".equals(productType)) {
-						final String masterid = (String) product.getAttribute("parentid").getValues()[0];
-						final IListingManager manager = ModelUtil.getManager(IListingManager.class, getContext());
-						final IListing master = manager.findById(masterid);
-						if (null != master) {
-							json.writeFieldName("master");
-							writeProduct(master, json, req, null);
-						}
-					}
-				}
-			});
 		}
 
 		json.writeEndObject();

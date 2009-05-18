@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
@@ -13,13 +13,16 @@ package org.eclipse.gyrex.examples.bugsearch.internal.setup;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.gyrex.common.debug.BundleDebug;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
-import org.eclipse.gyrex.configuration.preferences.PlatformScope;
 import org.eclipse.gyrex.configuration.service.IConfigurationService;
+import org.eclipse.gyrex.preferences.PlatformScope;
 import org.osgi.service.prefs.BackingStoreException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BugSearchDevSetup {
+
+	private static final Logger LOG = LoggerFactory.getLogger(BugSearchDevSetup.class);
 
 	public static final String DEFAULT_URL = "http:///bugsearch/";
 	public static final String PLUGIN_ID_BUGSEARCH = "org.eclipse.gyrex.examples.bugsearch";
@@ -41,7 +44,7 @@ public class BugSearchDevSetup {
 			preferences.put("rolesToStart", roles);
 			preferences.flush();
 		} catch (final Exception e) {
-			BundleDebug.debug("Error while activating required server roles. " + e.getMessage(), e);
+			LOG.error("Error while activating required server roles. " + e.getMessage(), e);
 		}
 	}
 

@@ -14,8 +14,8 @@ package org.eclipse.gyrex.examples.bugsearch.internal.app;
 import javax.servlet.ServletException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.gyrex.common.context.IContext;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
+import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchRTSetup;
@@ -28,7 +28,7 @@ import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
  */
 public class BugSearchApplication extends Application {
 
-	BugSearchApplication(final String id, final IContext context) {
+	BugSearchApplication(final String id, final IRuntimeContext context) {
 		super(id, context);
 	}
 

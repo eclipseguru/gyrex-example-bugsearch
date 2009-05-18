@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
@@ -32,8 +32,7 @@ import org.eclipse.gyrex.cds.service.query.ListingQuery;
 import org.eclipse.gyrex.cds.service.result.IListingResult;
 import org.eclipse.gyrex.cds.service.result.IListingResultFacet;
 import org.eclipse.gyrex.cds.service.result.IListingResultFacetValue;
-import org.eclipse.gyrex.common.context.IContext;
-import org.eclipse.gyrex.common.debug.BundleDebug;
+import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugList;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter;
@@ -41,6 +40,8 @@ import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListF
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.ValueAscendingComparator;
 import org.eclipse.gyrex.services.common.ServiceUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.RPC;
@@ -49,21 +50,23 @@ import com.google.gwt.user.server.rpc.SerializationPolicy;
 import com.google.gwt.user.server.rpc.SerializationPolicyLoader;
 
 /**
- * 
+ *
  */
 public class BugSearchServiceServlet extends RemoteServiceServlet implements BugSearchService {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = 1L;
 
-	private final IContext context;
+	private final IRuntimeContext context;
+
+	private static final Logger LOG = LoggerFactory.getLogger(BugSearchServiceServlet.class);
 
 	/**
 	 * Creates a new instance.
 	 * 
 	 * @param context
 	 */
-	public BugSearchServiceServlet(final IContext context) {
+	public BugSearchServiceServlet(final IRuntimeContext context) {
 		this.context = context;
 	}
 
@@ -74,7 +77,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 	protected SerializationPolicy doGetSerializationPolicy(final HttpServletRequest request, final String moduleBaseUrl, final String strongName) {
 		//		final String mountPoint = (String) request.getAttribute(IApplicationConstants.REQUEST_ATTRIBUTE_MOUNT_POINT);
 		//		if (!mountPoint.startsWith(moduleBaseUrl)) {
-		//			BundleDebug.debug("Module path outside application mount, this is not supported!");
+		//			BundleDebugOptions.debug("Module path outside application mount, this is not supported!");
 		//			return null;
 		//		}
 
@@ -91,7 +94,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 		// strip context path from module path
 		final String contextPath = request.getContextPath();
 		if ((modulePath == null) || !modulePath.startsWith(contextPath)) {
-			BundleDebug.debug("Module path outside application mount, this is not supported!");
+			LOG.trace("Module path outside application mount, this is not supported!");
 			return null;
 		}
 		final String contextRelativePath = modulePath.substring(contextPath.length());
@@ -106,7 +109,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 					final SerializationPolicy serializationPolicy = SerializationPolicyLoader.loadFromStream(is, exceptions);
 					if (!exceptions.isEmpty()) {
 						for (final ClassNotFoundException classNotFoundException : exceptions) {
-							BundleDebug.debug("Error while loading serialization policy!", classNotFoundException);
+							LOG.trace("Error while loading serialization policy!", classNotFoundException);
 						}
 					}
 					return serializationPolicy;
