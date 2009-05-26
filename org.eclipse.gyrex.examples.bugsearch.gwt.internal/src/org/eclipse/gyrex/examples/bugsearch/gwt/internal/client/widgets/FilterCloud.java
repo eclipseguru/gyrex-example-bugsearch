@@ -1,18 +1,20 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
 package org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.widgets;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.BugSearch;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.BugSearchHistoryManager;
@@ -26,7 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.AbstractImagePrototype.ImagePrototypeElement;
 
 /**
- * 
+ *
  */
 public class FilterCloud extends Widget {
 
@@ -36,6 +38,14 @@ public class FilterCloud extends Widget {
 	private static final String ATTR_VALUE = "filterValue";
 	/** FILTER_ID */
 	private static final String ATTR_FILTER_ID = "filterId";
+
+	private static final Set<String> defaultExpandFilters;
+	static {
+		defaultExpandFilters = new HashSet<String>();
+		defaultExpandFilters.add("tags");
+		defaultExpandFilters.add("keywords");
+	}
+
 	private final Element labelElement;
 	private List<Element> valueElements;
 	private final BugListFilter filter;
@@ -78,6 +88,11 @@ public class FilterCloud extends Widget {
 
 		getElement().appendChild(labelElement);
 		getElement().appendChild(contentElement);
+
+		// expand some filters by default
+		if (defaultExpandFilters.contains(filter.getId())) {
+			collapsed = false;
+		}
 
 		setCollapsed(collapsed);
 
