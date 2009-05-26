@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
@@ -27,6 +28,7 @@ import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
 import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
 import org.eclipse.gyrex.http.application.manager.IApplicationManager;
 import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
+import org.eclipse.gyrex.preferences.PlatformScope;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,9 +77,18 @@ public class BugSearchRuntimeSetupComponent {
 			return;
 		}
 
+		// define the repository
+		final IEclipsePreferences repositoryStore = new PlatformScope().getNode("org.eclipse.gyrex.persistence");
+		repositoryStore.node("repositories/" + IEclipseBugSearchConstants.REPOSITORY_ID).put("type", "org.eclipse.gyrex.persistence.solr.embedded");
+		try {
+			repositoryStore.flush();
+		} catch (final Exception e) {
+			LOG.error("Error while flushing preferences after defining repository: " + e, e);
+			return;
+		}
+
 		// configure the repository which the application should use
 		preferences.put("org.eclipse.gyrex.persistence", "repositories//application/x-cf-listings-solr", IEclipseBugSearchConstants.REPOSITORY_ID, false);
-		preferences.put("org.eclipse.gyrex.persistence", "repositories/" + IEclipseBugSearchConstants.REPOSITORY_ID + "//type", "org.eclipse.gyrex.persistence.solr.embedded", false);
 		try {
 			preferences.flush("org.eclipse.gyrex.persistence");
 		} catch (final Exception e) {
@@ -106,6 +117,8 @@ public class BugSearchRuntimeSetupComponent {
 		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/commenter", "Commenter,field,commenter_facet", false);
 		//		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/", ",field,_facet", false);
 		//		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/", ",field,_facet", false);
+
+		preferences.put("org.eclipse.gyrex.cds.service.solr", "activeFacets", "tags,keywords,classification,product,component,status,resolution,targetMilestone,version,statusWhiteboard,priority,severity,hardware,os,assignee,reporter,cc,commenter", false);
 		try {
 			preferences.flush("org.eclipse.gyrex.cds.service.solr");
 		} catch (final Exception e) {

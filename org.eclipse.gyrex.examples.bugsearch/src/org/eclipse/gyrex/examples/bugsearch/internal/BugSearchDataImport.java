@@ -36,11 +36,11 @@ import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.documents.Document;
 import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
-import org.eclipse.gyrex.configuration.service.IConfigurationService;
 import org.eclipse.gyrex.context.IRuntimeContext;
+import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
+import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
-import org.eclipse.gyrex.preferences.PlatformScope;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaAttribute;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaCorePlugin;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
@@ -165,6 +165,8 @@ public class BugSearchDataImport extends Job {
 					throw new OperationCanceledException();
 				}
 
+				LOG.debug("Processing bug {}", taskId);
+
 				final TaskData taskData = connector.getTaskData(taskRepository, taskId, new NullProgressMonitor());
 
 				// access task information
@@ -241,12 +243,6 @@ public class BugSearchDataImport extends Job {
 			}
 		}
 
-		/**
-		 * @param document
-		 * @param string
-		 * @param taskData
-		 * @param bugSeverity
-		 */
 		private void setField(final SolrInputDocument document, final String name, final TaskData taskData, final BugzillaAttribute bugzillaAttribute) {
 			final TaskAttribute attribute = taskData.getRoot().getAttribute(bugzillaAttribute.getKey());
 			if (null != attribute) {
@@ -339,6 +335,8 @@ public class BugSearchDataImport extends Job {
 			throw new OperationCanceledException();
 		}
 
+		LOG.debug("Query bugs by url: {}", url);
+
 		final IRepositoryQuery query = new RepositoryQuery(repository.getConnectorKind(), "");
 		query.setSummary("Query for changed tasks");
 		query.setUrl(url);
@@ -348,13 +346,14 @@ public class BugSearchDataImport extends Job {
 	private void queryForAllBugs(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
 		// for demo purposes we'll fetch only a few bugs in dev mode
 		if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
+			LOG.debug("Operating in development mode, only fetching a small number of bugs");
 			final String url = "https://bugs.eclipse.org/bugs/buglist.cgi?field0-0-0=bug_id&type0-0-0=lessthan&value0-0-0=100&field0-1-0=bug_id&type0-1-0=greaterthan&value0-1-0=0&order=Bug+Number";
 			queryByUrl(monitor, repository, connector, publisher, url);
 			return;
 		}
 
-		final IConfigurationService configurationService = PlatformConfiguration.getConfigurationService();
-		int start = configurationService.getInt(BugSearchActivator.PLUGIN_ID, "import.start", 0, getContext());
+		final IRuntimeContextPreferences preferences = PreferencesUtil.getPreferences(getContext());
+		int start = preferences.getInt(BugSearchActivator.PLUGIN_ID, "import.start", 0);
 		int oldBugsCount = 0;
 		int processed = 0;
 		final int fetchSize = 10000;
@@ -366,12 +365,11 @@ public class BugSearchDataImport extends Job {
 			oldBugsCount = publisher.getBugsCount();
 		} while ((processed > 0));//&& (oldBugsCount < 100000));
 
-		configurationService.putInt(BugSearchActivator.PLUGIN_ID, "import.start", start - 1, getContext(), false);
+		preferences.putInt(BugSearchActivator.PLUGIN_ID, "import.start", start - 1, false);
 		try {
-			new PlatformScope().getNode(BugSearchActivator.PLUGIN_ID).flush();
+			preferences.flush(BugSearchActivator.PLUGIN_ID);
 		} catch (final BackingStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Error while flushing bug search preferences for context " + getContext(), e);
 		}
 	}
 
@@ -413,10 +411,12 @@ public class BugSearchDataImport extends Job {
 				// get a report from repository
 				switch (mode) {
 					case INITIAL:
+						LOG.debug("initial indexing");
 						queryForAllBugs(monitor, repository, connector, publisher);
 						break;
 
 					case UPDATE:
+						LOG.debug("updating index");
 						queryForChanges(monitor, repository, connector, publisher, (1 + unit.toHours(interval)) + "h", NOW);
 						break;
 				}
@@ -440,6 +440,7 @@ public class BugSearchDataImport extends Job {
 			//listingManager.publish(docs.values());
 		} catch (final IllegalStateException e) {
 			// abort, bundle is inactive
+			LOG.warn("Something is missing, cancelling job.", e);
 			return Status.CANCEL_STATUS;
 		} catch (final Exception e) {
 			e.printStackTrace();
