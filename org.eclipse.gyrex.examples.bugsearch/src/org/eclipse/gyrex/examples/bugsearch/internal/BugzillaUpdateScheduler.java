@@ -35,6 +35,20 @@ public class BugzillaUpdateScheduler {
 		update = null;
 	}
 
+	public static synchronized void rescheduleInitialImportFollowedByUpdate() {
+		if (null == initialImport) {
+			return;
+		}
+
+		// cancel
+		cancelUpdateJob();
+		initialImport.cancel();
+
+		// re-schedule
+		// wait a few seconds before starting
+		initialImport.schedule(5000);
+	}
+
 	public static synchronized void scheduleInitialImportFollowedByUpdate(final IRuntimeContext context, final long interval, final TimeUnit timeUnit) {
 		if (null != initialImport) {
 			return;
