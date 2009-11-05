@@ -1,11 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2009 AGETO Service GmbH and others.
  * All rights reserved.
- *  
- * This program and the accompanying materials are made available under the 
+ *
+ * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
@@ -14,14 +14,11 @@ package org.eclipse.gyrex.examples.bugsearch.internal.app;
 import javax.servlet.ServletException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.gyrex.configuration.PlatformConfiguration;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
-import org.eclipse.gyrex.examples.bugsearch.internal.IEclipseBugSearchConstants;
 import org.eclipse.gyrex.http.application.Application;
 import org.eclipse.gyrex.http.registry.internal.BundleResourceProvider;
-import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
 
 /**
  * A fan shop application instance.
@@ -47,14 +44,14 @@ public class BugSearchApplication extends Application {
 			//getApplicationServiceSupport().registerServlet("/json", new JsonListingServlet(getContext()), null);
 
 			// let's expose the Solr admin interface in dev mode
-			if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
-				getApplicationServiceSupport().registerServlet("/solr/admin/*.jsp", new SolrAdminJspServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
-				getApplicationServiceSupport().registerResources("/solr", "web", new BundleResourceProvider(BugSearchActivator.getInstance().getBundle("org.apache.solr.servlet")));
-
-				// let's expose the Solr request handler
-				getApplicationServiceSupport().registerServlet("/solr/select", new SolrServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
-
-			}
+			//			if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
+			//				getApplicationServiceSupport().registerServlet("/solr/admin/*.jsp", new SolrAdminJspServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
+			//				getApplicationServiceSupport().registerResources("/solr", "web", new BundleResourceProvider(BugSearchActivator.getInstance().getBundle("org.apache.solr.servlet")));
+			//
+			//				// let's expose the Solr request handler
+			//				getApplicationServiceSupport().registerServlet("/solr/select", new SolrServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
+			//
+			//			}
 		} catch (final ServletException e) {
 			throw new CoreException(BugSearchActivator.getInstance().getStatusUtil().createError(0, e.getMessage(), e));
 		}

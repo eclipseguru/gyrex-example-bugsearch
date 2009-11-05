@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="CloudFree BugSearch (Incubation)" id="org.eclipse.cloudfree.examples.bugsearch.product" application="org.eclipse.cloudfree.boot.server" version="1.0" useFeatures="false">
+<product name="Gyrex BugSearch (Incubation)" uid="org.eclipse.gyrex.examples.products.bugsearch" application="org.eclipse.gyrex.boot.server" version="1.0" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
-      <linux>/org.eclipse.cloudfree.examples.bugsearch/config.ini</linux>
-      <macosx>/org.eclipse.cloudfree.examples.bugsearch/config.ini</macosx>
-      <solaris>/org.eclipse.cloudfree.examples.bugsearch/config.ini</solaris>
-      <win32>/org.eclipse.cloudfree.examples.bugsearch/config.ini</win32>
    </configIni>
 
    <launcherArgs>
@@ -16,10 +12,10 @@
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <launcher name="cloudfree">
+   <launcher name="gyrex">
       <solaris/>
       <win useIco="true">
-         <ico path="/org.eclipse.cloudfree.examples.bugsearch/icons/favicon.ico"/>
+         <ico path="/org.eclipse.gyrex.examples.bugsearch/icons/favicon.ico"/>
          <bmp/>
       </win>
    </launcher>
@@ -57,11 +53,35 @@
       <plugin id="org.apache.solr.core"/>
       <plugin id="org.apache.solr.servlet"/>
       <plugin id="org.codehaus.jackson"/>
+      <plugin id="org.eclipse.core.contenttype"/>
+      <plugin id="org.eclipse.core.jobs"/>
+      <plugin id="org.eclipse.core.net"/>
+      <plugin id="org.eclipse.core.net.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.net.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.core.net.win32.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
+      <plugin id="org.eclipse.e4.core.services"/>
+      <plugin id="org.eclipse.equinox.app"/>
+      <plugin id="org.eclipse.equinox.common"/>
+      <plugin id="org.eclipse.equinox.concurrent"/>
+      <plugin id="org.eclipse.equinox.ds"/>
+      <plugin id="org.eclipse.equinox.http.jetty"/>
+      <plugin id="org.eclipse.equinox.http.registry"/>
+      <plugin id="org.eclipse.equinox.http.servlet"/>
+      <plugin id="org.eclipse.equinox.jsp.jasper"/>
+      <plugin id="org.eclipse.equinox.log"/>
+      <plugin id="org.eclipse.equinox.preferences"/>
+      <plugin id="org.eclipse.equinox.registry"/>
+      <plugin id="org.eclipse.equinox.security"/>
+      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
+      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.transforms.hook" fragment="true"/>
       <plugin id="org.eclipse.gyrex.admin"/>
       <plugin id="org.eclipse.gyrex.admin.web.gwt"/>
       <plugin id="org.eclipse.gyrex.admin.web.gwt.client"/>
-      <plugin id="org.eclipse.cloudfree.boot"/>
-      <plugin id="org.eclipse.cloudfree.boot.defaultroles"/>
+      <plugin id="org.eclipse.gyrex.boot"/>
+      <plugin id="org.eclipse.gyrex.boot.defaultroles"/>
       <plugin id="org.eclipse.gyrex.cds.model"/>
       <plugin id="org.eclipse.gyrex.cds.model.solr"/>
       <plugin id="org.eclipse.gyrex.cds.service"/>
@@ -69,53 +89,28 @@
       <plugin id="org.eclipse.gyrex.common"/>
       <plugin id="org.eclipse.gyrex.configuration"/>
       <plugin id="org.eclipse.gyrex.configuration.impl"/>
-      <plugin id="org.eclipse.cloudfree.examples.bugsearch"/>
+      <plugin id="org.eclipse.gyrex.context"/>
+      <plugin id="org.eclipse.gyrex.examples.bugsearch"/>
       <plugin id="org.eclipse.gyrex.examples.bugsearch.gwt.internal"/>
-      <plugin id="org.eclipse.cloudfree.gwt.common"/>
+      <plugin id="org.eclipse.gyrex.gwt.common"/>
       <plugin id="org.eclipse.gyrex.gwt.service"/>
       <plugin id="org.eclipse.gyrex.http"/>
+      <plugin id="org.eclipse.gyrex.http.errorpagehandler" fragment="true"/>
+      <plugin id="org.eclipse.gyrex.http.errorpagehandler.resources"/>
       <plugin id="org.eclipse.gyrex.http.jetty"/>
       <plugin id="org.eclipse.gyrex.http.registry"/>
+      <plugin id="org.eclipse.gyrex.log"/>
+      <plugin id="org.eclipse.gyrex.log.slf4j.integration" fragment="true"/>
       <plugin id="org.eclipse.gyrex.model.common"/>
       <plugin id="org.eclipse.gyrex.monitoring"/>
       <plugin id="org.eclipse.gyrex.persistence"/>
       <plugin id="org.eclipse.gyrex.persistence.solr"/>
+      <plugin id="org.eclipse.gyrex.preferences"/>
       <plugin id="org.eclipse.gyrex.services.common"/>
       <plugin id="org.eclipse.gyrex.toolkit"/>
       <plugin id="org.eclipse.gyrex.toolkit.gwt.client"/>
       <plugin id="org.eclipse.gyrex.toolkit.gwt.server"/>
       <plugin id="org.eclipse.gyrex.toolkit.runtime"/>
-      <plugin id="org.eclipse.core.contenttype"/>
-      <plugin id="org.eclipse.core.jobs"/>
-      <plugin id="org.eclipse.core.net"/>
-      <plugin id="org.eclipse.core.net.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.net.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.runtime"/>
-      <plugin id="org.eclipse.equinox.app"/>
-      <plugin id="org.eclipse.equinox.common"/>
-      <plugin id="org.eclipse.equinox.http.jetty"/>
-      <plugin id="org.eclipse.equinox.http.registry"/>
-      <plugin id="org.eclipse.equinox.http.servlet"/>
-      <plugin id="org.eclipse.equinox.jsp.jasper"/>
-      <plugin id="org.eclipse.equinox.launcher"/>
-      <plugin id="org.eclipse.equinox.launcher.carbon.macosx" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.motif.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.motif.hpux.ia64_32" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.wpf.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.preferences"/>
-      <plugin id="org.eclipse.equinox.registry"/>
-      <plugin id="org.eclipse.equinox.security"/>
-      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
-      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.transforms.hook" fragment="true"/>
       <plugin id="org.eclipse.mylyn.bugzilla.core"/>
       <plugin id="org.eclipse.mylyn.commons.core"/>
       <plugin id="org.eclipse.mylyn.commons.net"/>
@@ -127,7 +122,13 @@
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.mortbay.jetty.server"/>
       <plugin id="org.mortbay.jetty.util"/>
+      <plugin id="org.slf4j.api"/>
    </plugins>
 
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="3" />
+   </configurations>
 
 </product>
