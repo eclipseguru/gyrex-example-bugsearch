@@ -11,11 +11,14 @@ java.util.IdentityHashMap, true
 java.util.LinkedHashMap, true
 java.util.LinkedList, true
 java.util.Stack, true
+java.util.TreeMap, true
 java.util.Vector, true
 org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug, true
 org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugList, true
 org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter, true
 org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue, true
+org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValueComparator, false
 [Lorg.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;, true
 [Lorg.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilter;, true
 [Lorg.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug;, true
+org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.ValueAscendingComparator, true
