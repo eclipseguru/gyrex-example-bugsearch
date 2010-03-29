@@ -189,7 +189,7 @@ public class BugSearchRestServlet extends HttpServlet {
 				if ((null != facetValues) && (facetValues.length > 0)) {
 					for (final String facetValue : facetValues) {
 						if (StringUtils.isNotBlank(facetValue)) {
-							query.addFilterQuery('+' + ListingQuery.escapeQueryChars(activeFacetName) + ':' + ListingQuery.escapeQueryChars(facetValue));
+							query.addFilterQuery('+' + getFacetField(activeFacetName) + ':' + ListingQuery.escapeQueryChars(facetValue));
 						}
 					}
 				}
@@ -300,6 +300,18 @@ public class BugSearchRestServlet extends HttpServlet {
 	 */
 	public IRuntimeContext getContext() {
 		return context;
+	}
+
+	String getFacetField(final String facetId) {
+		final IRuntimeContextPreferences preferences = PreferencesUtil.getPreferences(getContext());
+		final String facetString = preferences.get("org.eclipse.gyrex.cds.service.solr", "facets/" + facetId, null);
+		if (null != facetString) {
+			final String[] split = StringUtils.split(facetString, ',');
+			if ((split.length == 3) && split[1].equals("field") && StringUtils.isNotBlank(split[2])) {
+				return split[2];
+			}
+		}
+		return null;
 	}
 
 	private void writeFacet(final IListingResultFacet facet, final JsonGenerator json) throws IOException {
