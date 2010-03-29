@@ -176,7 +176,8 @@
    <field name="titleSubMatch" type="textSubMatch" indexed="true" stored="false"/>
 
    <field name="description" type="text" indexed="true" stored="true" omitNorms="true"/>
-   <field name="comment" type="text" indexed="true" stored="true" omitNorms="true"/>
+   <field name="comment" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true"/>
+   <field name="cc" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true"/>
 
    <field name="reporterSubMatch" type="textSubMatch" indexed="true" stored="false" omitNorms="true"/>
    <field name="assigneeSubMatch" type="textSubMatch" indexed="true" stored="false" omitNorms="true"/>
