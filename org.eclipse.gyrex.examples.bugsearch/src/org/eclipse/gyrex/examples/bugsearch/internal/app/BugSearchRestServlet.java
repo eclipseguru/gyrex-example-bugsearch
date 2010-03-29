@@ -22,17 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.JavaTypeMapper;
 import org.eclipse.gyrex.cds.model.IListing;
 import org.eclipse.gyrex.cds.model.IListingAttribute;
 import org.eclipse.gyrex.cds.model.IListingManager;
@@ -46,13 +35,23 @@ import org.eclipse.gyrex.cds.service.result.IListingResult;
 import org.eclipse.gyrex.cds.service.result.IListingResultFacet;
 import org.eclipse.gyrex.cds.service.result.IListingResultFacetValue;
 import org.eclipse.gyrex.context.IRuntimeContext;
+import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
+import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.http.application.ApplicationException;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.services.common.ServiceUtil;
 
-import com.ibm.icu.text.MeasureFormat;
-import com.ibm.icu.util.CurrencyAmount;
-import com.ibm.icu.util.ULocale;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JavaTypeMapper;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 
 /**
  * A service for delivering bugs in a rest style approach
@@ -62,6 +61,8 @@ public class BugSearchRestServlet extends HttpServlet {
 	static interface Enhancer {
 		void enhanceWithinObject(JsonGenerator json) throws IOException;
 	}
+
+	private static final String[] AUTO_COMPLETE_ATTRIBUTES = StringUtils.split("id,title,reporter,keyword,product,component,score,status,resolution", ',');
 
 	private static final String ID_PATH_PREFIX = "/_id/";
 	private static final String AUTOCOMPLETE_PATH_PREFIX = "/_autocomplete/";
@@ -113,8 +114,6 @@ public class BugSearchRestServlet extends HttpServlet {
 
 		final SolrQuery solrQuery = new SolrQuery(autocompleteTerm);
 		solrQuery.setQueryType("autocomplete");
-		// ignore variations
-		solrQuery.addFilterQuery("-type:variation");
 
 		final QueryResponse response = executor.query(solrQuery);
 
@@ -131,7 +130,7 @@ public class BugSearchRestServlet extends HttpServlet {
 			json.useDefaultPrettyPrinter();
 		}
 
-		writeAutoCompleteResult(response, json, req);
+		writeJsonAutoCompleteResult(response, json, req);
 
 		json.close();
 	}
@@ -167,13 +166,11 @@ public class BugSearchRestServlet extends HttpServlet {
 			query.setMaxResults(1);
 			isSingle = true;
 		} else {
+			// query
 			final String q = req.getParameter("q");
 			if (StringUtils.isNotBlank(q)) {
 				query.setQuery(q);
 			}
-
-			// ignore variations
-			query.addFilterQuery("-type:variation");
 
 			// add filters
 			final String[] f = req.getParameterValues("f");
@@ -185,22 +182,15 @@ public class BugSearchRestServlet extends HttpServlet {
 				}
 			}
 
-			// simple category selection
-			final String[] categories = req.getParameterValues("c");
-			if ((null != categories) && (categories.length > 0)) {
-				for (final String cat : categories) {
-					if (StringUtils.isNotBlank(cat)) {
-						query.addFilterQuery("+category:" + ClientUtils.escapeQueryChars(cat));
-					}
-				}
-			}
-
-			// simple tags selection
-			final String[] tags = req.getParameterValues("t");
-			if ((null != tags) && (tags.length > 0)) {
-				for (final String tag : tags) {
-					if (StringUtils.isNotBlank(tag)) {
-						query.addFilterQuery("+tags:" + ClientUtils.escapeQueryChars(tag));
+			// look for easy-access facet parameters
+			final String[] activeFacets = getActiveFacets();
+			for (final String activeFacetName : activeFacets) {
+				final String[] facetValues = req.getParameterValues(activeFacetName);
+				if ((null != facetValues) && (facetValues.length > 0)) {
+					for (final String facetValue : facetValues) {
+						if (StringUtils.isNotBlank(facetValue)) {
+							query.addFilterQuery('+' + ListingQuery.escapeQueryChars(activeFacetName) + ':' + ListingQuery.escapeQueryChars(facetValue));
+						}
 					}
 				}
 			}
@@ -224,6 +214,9 @@ public class BugSearchRestServlet extends HttpServlet {
 				}
 
 				query.setMaxResults(maxResults);
+			} else {
+				// default to 50
+				query.setMaxResults(50);
 			}
 		}
 
@@ -236,8 +229,6 @@ public class BugSearchRestServlet extends HttpServlet {
 		final String format = req.getParameter("fmt");
 		if (StringUtils.isBlank(format) || StringUtils.equals("json", format)) {
 			writeJson(req, resp, isSingle, result);
-		} else if (StringUtils.equals("php", format)) {
-			writePhp(req, resp, isSingle, result);
 		} else {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
@@ -275,10 +266,11 @@ public class BugSearchRestServlet extends HttpServlet {
 		writer.println("      (see JavaDoc of org.eclipse.gyrex.cds.service.query.ListingQuery#setQuery(String))");
 		writer.println("f ... a filter query (multiple possible, will be interpreted as AND; ..&f=..&f=..)");
 		writer.println("      (eg. the facet 'filter' attribute from the result set)");
+		writer.println("      (see JavaDoc of org.eclipse.gyrex.cds.service.query.ListingQuery#setAdvancedQuery(String) for escaping rules)");
 		writer.println("s ... start index (zero-based, used for paging)");
-		writer.println("r ... rows to return (defaults to 10, used for paging)");
-		writer.println("t ... easy retrieval of a tag (multiple possible, will be interpreted as AND; ..&t=eclipse&t=helpwanted)");
-		writer.println("      (to filter for tags using OR use a filter \"..&f=+tags:(eclipse helpwanted)\")");
+		writer.println("r ... rows to return (defaults to 50, used for paging)");
+		writer.println("<facetname> ... easy retrieval of a facet (multiple possible, will be interpreted as AND; ..&tag=eclipse&tag=helpwanted)");
+		writer.println("      (to filter for facets using OR use a filter \"..&f=+tags:(eclipse helpwanted)\")");
 		writer.println();
 		writer.println();
 		writer.println("Debug Parameters");
@@ -291,9 +283,14 @@ public class BugSearchRestServlet extends HttpServlet {
 		writer.println("Output Parameters");
 		writer.println("-----------------");
 		writer.println();
-		writer.println("fmt ... the desired output format; currently supported are 'json' (default) and 'php'");
+		writer.println("fmt ... the desired output format; currently supported are 'json' (default)");
 		writer.println();
 		writer.flush();
+	}
+
+	String[] getActiveFacets() {
+		final IRuntimeContextPreferences preferences = PreferencesUtil.getPreferences(getContext());
+		return StringUtils.split(preferences.get("org.eclipse.gyrex.cds.service.solr", "activeFacets", null), ',');
 	}
 
 	/**
@@ -303,31 +300,6 @@ public class BugSearchRestServlet extends HttpServlet {
 	 */
 	public IRuntimeContext getContext() {
 		return context;
-	}
-
-	private void writeAutoCompleteResult(final QueryResponse response, final JsonGenerator json, final HttpServletRequest req) throws IOException {
-		json.writeStartObject();
-
-		writeValue("version", "1.0", json);
-		writeValue("type", "application/x-gyrex-bugsearch-autocomplete-json", json);
-
-		writeValue("queryTime", response.getQTime(), json);
-
-		json.writeFieldName("bugs");
-		json.writeStartArray();
-		final SolrDocumentList results = response.getResults();
-		for (final SolrDocument solrDocument : results) {
-			json.writeStartObject();
-			writeValue("title", (String) solrDocument.getFirstValue("title"), json);
-			writeValue("uripath", (String) solrDocument.getFirstValue("uripath"), json);
-			writeValue("category", (String) solrDocument.getFirstValue("category"), json);
-			writeValue("id", (String) solrDocument.getFirstValue("id"), json);
-			writeValue("name", (String) solrDocument.getFirstValue("name"), json);
-			writeValue("img48", (String) solrDocument.getFirstValue("img48"), json);
-			json.writeEndObject();
-		}
-		json.writeEndArray();
-		json.writeEndObject();
 	}
 
 	private void writeFacet(final IListingResultFacet facet, final JsonGenerator json) throws IOException {
@@ -377,6 +349,29 @@ public class BugSearchRestServlet extends HttpServlet {
 		json.close();
 	}
 
+	private void writeJsonAutoCompleteResult(final QueryResponse response, final JsonGenerator json, final HttpServletRequest req) throws IOException {
+		json.writeStartObject();
+
+		writeValue("version", "1.0", json);
+		writeValue("type", "application/x-gyrex-bugsearch-autocomplete-json", json);
+
+		writeValue("queryTime", response.getQTime(), json);
+
+		json.writeFieldName("bugs");
+		json.writeStartArray();
+		final SolrDocumentList results = response.getResults();
+		for (final SolrDocument solrDocument : results) {
+			writeJsonBug(null, json, req, null);
+			json.writeStartObject();
+			for (final String attributeName : AUTO_COMPLETE_ATTRIBUTES) {
+				writeValue(attributeName, (String) solrDocument.getFirstValue(attributeName), json);
+			}
+			json.writeEndObject();
+		}
+		json.writeEndArray();
+		json.writeEndObject();
+	}
+
 	private void writeJsonBug(final IListing listing, final JsonGenerator json, final HttpServletRequest req, final Enhancer enhancer) throws IOException {
 		if (null == listing) {
 			return;
@@ -389,27 +384,6 @@ public class BugSearchRestServlet extends HttpServlet {
 		writeValue("description", listing.getDescription(), json);
 		writeValue("uri", getBaseUrl(req).append(listing.getUriPath()).toString(), json);
 		writeValue("uripath", listing.getUriPath(), json);
-
-		final IListingAttribute categoryAttribute = listing.getAttribute("category");
-		if ((null != categoryAttribute) && (categoryAttribute.getValues().length > 0)) {
-			writeValue("category", categoryAttribute.getValues()[0].toString(), json);
-		}
-
-		final IListingAttribute priceAttribute = listing.getAttribute("price");
-		if ((null != priceAttribute) && (priceAttribute.getValues().length > 0)) {
-			// the first price the formated store price
-			writeValue("shopPrice", MeasureFormat.getCurrencyFormat(ULocale.US).format(new CurrencyAmount((Double) priceAttribute.getValues()[0], com.ibm.icu.util.Currency.getInstance("USD"))), json);
-		}
-
-		final IListingAttribute typeAttribute = listing.getAttribute("type");
-		if ((null != typeAttribute) && (typeAttribute.getValues().length > 0)) {
-			writeValue("type", typeAttribute.getValues()[0].toString(), json);
-		}
-
-		final IListingAttribute parentIdAttribute = listing.getAttribute("parentid");
-		if ((null != parentIdAttribute) && (parentIdAttribute.getValues().length > 0)) {
-			writeValue("parentid", parentIdAttribute.getValues()[0].toString(), json);
-		}
 
 		final IListingAttribute[] attributes = listing.getAttributes();
 		if (attributes.length > 0) {
@@ -481,61 +455,10 @@ public class BugSearchRestServlet extends HttpServlet {
 		if (listings.length == 1) {
 			json.writeFieldName("bug");
 			final IListing bug = listings[0];
-			writeJsonBug(bug, json, req, new Enhancer() {
-
-				@Override
-				public void enhanceWithinObject(final JsonGenerator json) throws IOException {
-					final String bugType = (String) bug.getAttribute("type").getValues()[0];
-					if ("variable-bug".equals(bugType)) {
-						final Object[] variationids = bug.getAttribute("variationids").getValues();
-						json.writeFieldName("variations");
-						json.writeStartObject();
-						final IListingManager manager = ModelUtil.getManager(IListingManager.class, getContext());
-						for (final Object variationId : variationids) {
-							final IListing variation = manager.findById((String) variationId);
-							if (null != variation) {
-								json.writeFieldName((String) variationId);
-								writeJsonBug(variation, json, req, null);
-							}
-						}
-						json.writeEndObject();
-					} else if ("variation".equals(bugType)) {
-						final String masterid = (String) bug.getAttribute("parentid").getValues()[0];
-						final IListingManager manager = ModelUtil.getManager(IListingManager.class, getContext());
-						final IListing master = manager.findById(masterid);
-						if (null != master) {
-							json.writeFieldName("master");
-							writeJsonBug(master, json, req, null);
-						}
-					}
-				}
-			});
+			writeJsonBug(bug, json, req, null);
 		}
 
 		json.writeEndObject();
-	}
-
-	private void writePhp(final HttpServletRequest req, final HttpServletResponse resp, final boolean isSingle, final IListingResult result) throws IOException {
-		if (req.getParameter("text") != null) {
-			resp.setContentType("text/plain");
-		} else {
-			resp.setContentType("application/json");
-		}
-		resp.setCharacterEncoding("UTF-8");
-
-		final PrintWriter writer = resp.getWriter();
-		final JsonGenerator json = new JsonFactory().createJsonGenerator(writer);
-		if (req.getParameter("text") != null) {
-			json.useDefaultPrettyPrinter();
-		}
-
-		if (isSingle) {
-			writeJsonSingleBugResult(result, json, req);
-		} else {
-			writeJsonBugResult(result, json, req);
-		}
-
-		json.close();
 	}
 
 	private void writeQuery(final ListingQuery query, final JsonGenerator json) throws IOException {

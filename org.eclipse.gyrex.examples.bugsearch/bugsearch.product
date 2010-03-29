@@ -9,7 +9,12 @@
    <launcherArgs>
       <programArgs>-console -nosplash</programArgs>
       <vmArgs>-Dorg.eclipse.equinox.http.jetty.autostart=false</vmArgs>
-      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+      <vmArgsLin>-XX:+UseParallelGC</vmArgsLin>
+      <vmArgsMac>-XstartOnFirstThread 
+-Dorg.eclipse.swt.internal.carbon.smallFonts
+-XX:+UseParallelGC</vmArgsMac>
+      <vmArgsSol>-XX:+UseParallelGC</vmArgsSol>
+      <vmArgsWin>-XX:+UseParallelGC</vmArgsWin>
    </launcherArgs>
 
    <launcher name="gyrex">

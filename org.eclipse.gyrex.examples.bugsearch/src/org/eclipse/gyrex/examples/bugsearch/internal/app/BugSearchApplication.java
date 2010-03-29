@@ -13,12 +13,13 @@ package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 import javax.servlet.ServletException;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.http.application.Application;
 import org.eclipse.gyrex.http.registry.internal.BundleResourceProvider;
+
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * A fan shop application instance.
@@ -41,7 +42,7 @@ public class BugSearchApplication extends Application {
 
 			// register the  listing servlet
 			//getApplicationServiceSupport().registerServlet("/", new ListingServlet(getContext()), null);
-			//getApplicationServiceSupport().registerServlet("/json", new JsonListingServlet(getContext()), null);
+			getApplicationServiceSupport().registerServlet("/query", new BugSearchRestServlet(getContext()), null);
 
 			// let's expose the Solr admin interface in dev mode
 			//			if (PlatformConfiguration.isOperatingInDevelopmentMode()) {

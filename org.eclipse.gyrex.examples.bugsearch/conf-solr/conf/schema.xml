@@ -2,22 +2,22 @@
 <!--
     Copyright (c) 2009 AGETO Service GmbH and others.
     All rights reserved.
-     
-    This program and the accompanying materials are made available under the 
+
+    This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v1.0 which accompanies this distribution,
     and is available at http://www.eclipse.org/legal/epl-v10.html.
-    
+
     Contributors:
         Gunnar Wagenknecht - initial API and implementation
  -->
- 
+
 <!--
  This is the Gyrex Fanshop specific Solr index schema configuration file.
-  
+
  For more information, on how to customize this file, please see
  http://wiki.apache.org/solr/SchemaXml
  -->
-<schema name="fanshop" version="1.1">
+<schema name="bugsearch" version="1.1">
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
@@ -51,7 +51,7 @@
         -->
     <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/> 
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
                 words="stopwords.txt"
@@ -72,11 +72,11 @@
       </analyzer>
     </fieldType>
 
-    <!-- a text field which allos sub string matching
+    <!-- a text field which allows sub string matching
          (use with care, it can grow your index exponentially) -->
     <fieldType name="textSubMatch" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/> 
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
                 words="stopwords.txt"
@@ -99,7 +99,7 @@
     <!-- A text field tuned for auto completion -->
     <fieldType name="textAutocomplete" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
-        <tokenizer class="solr.WhitespaceTokenizerFactory"/> 
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.NGramFilterFactory" minGramSize="2" maxGramSize="8"/>
@@ -145,7 +145,7 @@
       </analyzer>
     </fieldType>
 
-    <fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField" /> 
+    <fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField" />
  </types>
 
 
@@ -164,17 +164,17 @@
        boosting for the field, and saves some memory).  Only full-text
        fields or fields that need an index-time boost need norms.
      termVectors: [false] set to true to store the term vector for a given field.
-       When using MoreLikeThis, fields used for similarity should be stored for 
+       When using MoreLikeThis, fields used for similarity should be stored for
        best performance.
    -->
 
-   <field name="id" type="string" indexed="true" stored="true" required="true"/> 
+   <field name="id" type="string" indexed="true" stored="true" required="true"/>
 
    <field name="title" type="text" indexed="true" stored="true" required="true"/>
    <field name="titleSort" type="string" indexed="true" stored="false"/>
    <field name="titleAutocomplete" type="textAutocomplete" indexed="true" stored="false"/>
    <field name="titleSubMatch" type="textSubMatch" indexed="true" stored="false"/>
-   
+
    <field name="description" type="text" indexed="true" stored="true" omitNorms="true"/>
    <field name="comment" type="text" indexed="true" stored="true" omitNorms="true"/>
 
@@ -185,7 +185,7 @@
    <field name="votes" type="sint" indexed="true" stored="true" omitNorms="true"/>
    <field name="ccCount" type="sint" indexed="true" stored="true" omitNorms="true"/>
    <field name="commentsCount" type="sint" indexed="true" stored="true" omitNorms="true"/>
-   
+
    <field name="created" type="date" indexed="true" stored="true"  multiValued="false"/>
 
    <!-- catchall field, containing all other searchable text fields (implemented
@@ -193,7 +193,7 @@
    <field name="text" type="text" indexed="true" stored="false" multiValued="true" omitNorms="true"/>
 
    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
-   
+
    <dynamicField name="*_i"  type="sint"    indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*_s"  type="string"  indexed="true"  stored="true" multiValued="true"/>
    <dynamicField name="*_l"  type="slong"   indexed="true"  stored="true" multiValued="true"/>
@@ -206,7 +206,7 @@
    <dynamicField name="*_facet"  type="string" indexed="true" stored="false" multiValued="true" omitNorms="true"/>
 
    <dynamicField name="*" type="text" indexed="true" stored="true" multiValued="true"/>
-   
+
  </fields>
 
  <uniqueKey>id</uniqueKey>
@@ -219,7 +219,7 @@
    <copyField source="title" dest="titleSort"/>
    <copyField source="title" dest="titleAutocomplete"/>
    <copyField source="title" dest="titleSubMatch"/>
- 
+
    <copyField source="reporter" dest="text"/>
    <copyField source="reporter" dest="reporterSubMatch"/>
 

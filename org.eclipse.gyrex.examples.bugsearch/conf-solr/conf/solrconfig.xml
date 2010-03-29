@@ -2,17 +2,17 @@
 <!--
     Copyright (c) 2009 AGETO Service GmbH and others.
     All rights reserved.
-     
-    This program and the accompanying materials are made available under the 
+
+    This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v1.0 which accompanies this distribution,
     and is available at http://www.eclipse.org/legal/epl-v10.html.
-    
+
     Contributors:
         Gunnar Wagenknecht - initial API and implementation
  -->
- 
+
 <!--
- This is the Gyrex Fanshop specific Solr configuration file. 
+ This is the Gyrex Fanshop specific Solr configuration file.
  -->
 <config>
   <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
@@ -71,12 +71,12 @@
   <requestDispatcher handleSelect="true" >
     <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" />
     <httpCaching lastModifiedFrom="openTime"
-                 etagSeed="Fanshop-Solr">
+                 etagSeed="BugSearch-Solr">
        <!-- <cacheControl>max-age=30, public</cacheControl> -->
     </httpCaching>
   </requestDispatcher>
-  
-      
+
+
   <requestHandler name="standard" class="solr.SearchHandler" default="true">
      <lst name="defaults">
        <str name="echoParams">explicit</str>
@@ -96,10 +96,10 @@
         text^0.01 title^2.5 description^0.3 comment^0.1 product^4
      </str>
      <str name="bf">
-        recip(rord(created),1,1000,1000) 
+        recip(rord(created),1,1000,1000)
      </str>
      <str name="fl">
-        id,title,description,reporter,keyword,product,component,score,status,resolution
+        id,title,reporter,keyword,product,component,score,status,resolution
      </str>
      <str name="mm">
         2&lt;-1 5&lt;-2 6&lt;90%
@@ -109,10 +109,28 @@
     </lst>
   </requestHandler>
 
+  <!-- optimized handler for auto complete -->
+  <requestHandler name="autocomplete" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">dismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+        titleAutocomplete^1 title^1.2
+     </str>
+     <str name="fl">
+        id,title,reporter,keyword,product,component,score,status,resolution
+     </str>
+     <str name="q.alt">*:*</str>
+     <str name="hl">true</str>
+     <str name="hl.fl">title</str>
+    </lst>
+  </requestHandler>
+
   <requestHandler name="/update" class="solr.XmlUpdateRequestHandler" />
   <requestHandler name="/analysis" class="solr.AnalysisRequestHandler" />
   <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
-  
+
   <admin>
     <defaultQuery>solr</defaultQuery>
   </admin>
