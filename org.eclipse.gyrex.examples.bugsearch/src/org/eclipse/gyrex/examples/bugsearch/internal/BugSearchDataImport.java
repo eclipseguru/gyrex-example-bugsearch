@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.gyrex.examples.bugsearch.internal;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,16 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.common.SolrInputDocument;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.documents.Document;
 import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
@@ -41,6 +32,15 @@ import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaAttribute;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaCorePlugin;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
@@ -52,8 +52,12 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskCommentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
+
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,12 +187,15 @@ public class BugSearchDataImport extends Job {
 				// comments
 				final List<TaskAttribute> taskComments = taskData.getAttributeMapper().getAttributesByType(taskData, TaskAttribute.TYPE_COMMENT);
 				if (taskComments != null) {
+					final List<String> commenters = new ArrayList<String>(taskComments.size());
+					final List<String> comments = new ArrayList<String>(taskComments.size());
 					for (final TaskAttribute commentAttribute : taskComments) {
 						final TaskCommentMapper taskComment = TaskCommentMapper.createFrom(commentAttribute);
-						setField(document, "commenter", taskComment.getAuthor().getName());
-						setField(document, "comment", taskComment.getText());
-						//setField(document, "comment_date", taskComment.getCreationDate());
+						commenters.add(taskComment.getAuthor().getName());
+						comments.add(taskComment.getText());
 					}
+					setField(document, "commenter", commenters);
+					setField(document, "comment", comments);
 					setField(document, "commentsCount", taskComments.size());
 				}
 
@@ -213,9 +220,7 @@ public class BugSearchDataImport extends Job {
 
 				final List<String> cc = taskMapping.getCc();
 				setField(document, "ccCount", null != cc ? cc.size() : 0);
-				for (final String ccName : cc) {
-					setField(document, "cc", ccName);
-				}
+				setField(document, "cc", cc);
 
 				setField(document, "votes", taskData, BugzillaAttribute.VOTES);
 
