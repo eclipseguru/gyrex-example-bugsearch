@@ -25,7 +25,6 @@ import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.documents.Document;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -95,7 +94,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 		this.repository = repository;
 		this.cancelMonitor = cancelMonitor;
 		bugsCount = new AtomicInteger();
-		executorService = Executors.newFixedThreadPool(5);
+		executorService = Executors.newFixedThreadPool(BugSearchIndexJob.PARALLEL_THREADS);
 		openTasks = new AtomicInteger();
 	}
 
@@ -222,8 +221,15 @@ public final class DocumentsPublisher extends TaskDataCollector {
 			}
 			repository.add(document);
 
-		} catch (final CoreException e) {
-			LOG.error("error while fetching bug data", e);
+		} catch (final Exception e) {
+			LOG.error("error while fetching bug data: " + e.getMessage(), e);
+
+			// reschedule
+			if (!cancelMonitor.isCanceled()) {
+				openTasks.incrementAndGet();
+				executorService.execute(new PublishTaskRunnable(taskId));
+				LOG.error("rescheduled bug " + taskId + " for indexing because of previous error");
+			}
 		} finally {
 			openTasks.decrementAndGet();
 		}

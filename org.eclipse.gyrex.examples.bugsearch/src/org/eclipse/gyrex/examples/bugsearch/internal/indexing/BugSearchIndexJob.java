@@ -47,7 +47,9 @@ public abstract class BugSearchIndexJob extends Job {
 	private static final Logger LOG = LoggerFactory.getLogger(BugSearchIndexJob.class);
 	private final IRuntimeContext context;
 
-	public static final String URL = "https://bugs.eclipse.org/bugs/";
+	public static final Object FAMILY = new Object();
+	public static String URL = "https://bugs.eclipse.org/bugs/";
+	public static int PARALLEL_THREADS = 8;
 
 	/**
 	 * Creates a new instance.
@@ -59,6 +61,11 @@ public abstract class BugSearchIndexJob extends Job {
 		this.context = context;
 		setPriority(LONG);
 		setRule(new MutexRule(context.getContextPath().toString().intern()));
+	}
+
+	@Override
+	public boolean belongsTo(final Object family) {
+		return FAMILY == family;
 	}
 
 	protected abstract void doIndex(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher);
@@ -89,7 +96,7 @@ public abstract class BugSearchIndexJob extends Job {
 		// for demo purposes we'll fetch only a few bugs in dev mode
 		if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
 			LOG.debug("Operating in development mode, only fetching a small number of bugs");
-			final String url = "https://bugs.eclipse.org/bugs/buglist.cgi?field0-0-0=bug_id&type0-0-0=lessthan&value0-0-0=100&field0-1-0=bug_id&type0-1-0=greaterthan&value0-1-0=0&order=Bug+Number";
+			final String url = URL + "buglist.cgi?field0-0-0=bug_id&type0-0-0=lessthan&value0-0-0=100&field0-1-0=bug_id&type0-1-0=greaterthan&value0-1-0=0&order=Bug+Number";
 			queryByUrl(monitor, repository, connector, publisher, url);
 			return;
 		}
@@ -115,12 +122,12 @@ public abstract class BugSearchIndexJob extends Job {
 	}
 
 	protected void queryForBugsRange(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher, final int start, final int numberOfBugs) {
-		final String url = "https://bugs.eclipse.org/bugs/buglist.cgi?field0-0-0=bug_id&type0-0-0=lessthan&value0-0-0=" + (start + numberOfBugs + 1) + "&field0-1-0=bug_id&type0-1-0=greaterthan&value0-1-0=" + start + "&order=Bug+Number";
+		final String url = URL + "buglist.cgi?field0-0-0=bug_id&type0-0-0=lessthan&value0-0-0=" + (start + numberOfBugs + 1) + "&field0-1-0=bug_id&type0-1-0=greaterthan&value0-1-0=" + start + "&order=Bug+Number";
 		queryByUrl(monitor, repository, connector, publisher, url);
 	}
 
 	protected void queryForChanges(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher, final String start, final String end) {
-		final String url = "https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&chfieldfrom=" + start + "&chfieldto=" + end + "&order=Last+Changed";
+		final String url = URL + "buglist.cgi?query_format=advanced&chfieldfrom=" + start + "&chfieldto=" + end + "&order=Last+Changed";
 		queryByUrl(monitor, repository, connector, publisher, url);
 	}
 

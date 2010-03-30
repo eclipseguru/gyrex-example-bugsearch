@@ -20,6 +20,7 @@ import org.eclipse.gyrex.examples.bugsearch.internal.indexing.DocumentsPublisher
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.OptimizeIndexJob;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
@@ -35,38 +36,63 @@ import org.apache.commons.lang.math.NumberUtils;
 @SuppressWarnings("restriction")
 public class BugSearchCommandComponent implements CommandProvider {
 
+	private static String getJobStateAsString(final int state) {
+		switch (state) {
+			case Job.RUNNING:
+				return "RUNNING";
+			case Job.WAITING:
+				return "WAITING";
+			case Job.SLEEPING:
+				return "SLEEPING";
+			case Job.NONE:
+				return "NONE";
+			default:
+				return "(unknown)";
+		}
+	}
+
 	private IRuntimeContextRegistry contextRegistry;
 
-	public void _bscancelImport(final CommandInterpreter ci) {
+	public void _bsCancelImport(final CommandInterpreter ci) {
 		BugzillaUpdateScheduler.cancelImportJob();
 		ci.println("Canceld update job.");
 	}
 
-	public void _bsindex(final CommandInterpreter ci) {
+	public void _bsConcurrency(final CommandInterpreter ci) {
+		// get (optional) fetch length
+		final int concurrencyLevel = NumberUtils.toInt(ci.nextArgument(), 8);
+		BugSearchIndexJob.PARALLEL_THREADS = concurrencyLevel;
+		ci.println("Concurrency set to " + concurrencyLevel + " threads for next scheduled indexing job.");
+	}
+
+	public void _bsIndex(final CommandInterpreter ci) {
 		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
 		if (null == eclipseBugSearchContext) {
 			ci.println("Eclipse bug search context not found!");
 			return;
 		}
 
-		// get bug numbers
+		// get bug number
 		final int startId = NumberUtils.toInt(ci.nextArgument());
 		if (startId == 0) {
 			ci.println("Bug number must be greater 0!");
 			return;
 		}
 
+		// get (optional) fetch length
+		final int length = NumberUtils.toInt(ci.nextArgument(), 1);
+
 		// schedule indexing
 		new BugSearchIndexJob("bug indexing", eclipseBugSearchContext) {
 			@Override
 			protected void doIndex(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
-				queryForBugsRange(monitor, repository, connector, publisher, startId, 1);
+				queryForBugsRange(monitor, repository, connector, publisher, startId, length);
 			}
 		}.schedule(5000);
 		ci.println("Scheduled indexing bug " + startId + ".");
 	}
 
-	public void _bsoptimize(final CommandInterpreter ci) {
+	public void _bsOptimize(final CommandInterpreter ci) {
 		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
 		if (null == eclipseBugSearchContext) {
 			ci.println("Eclipse bug search context not found!");
@@ -78,7 +104,7 @@ public class BugSearchCommandComponent implements CommandProvider {
 		ci.println("Scheduled index optimization.");
 	}
 
-	public void _bsreindex(final CommandInterpreter ci) {
+	public void _bsReindex(final CommandInterpreter ci) {
 		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
 		if (null == eclipseBugSearchContext) {
 			ci.println("Eclipse bug search context not found!");
@@ -100,6 +126,18 @@ public class BugSearchCommandComponent implements CommandProvider {
 		ci.println("Rescheduled indexing.");
 	}
 
+	public void _bsStatus(final CommandInterpreter ci) {
+		final Job[] jobs = Job.getJobManager().find(BugSearchIndexJob.FAMILY);
+		if ((null == jobs) || (jobs.length == 0)) {
+			ci.println("No jobs scheduled.");
+			return;
+		}
+
+		for (final Job job : jobs) {
+			ci.println(job + " " + getJobStateAsString(job.getState()));
+		}
+	}
+
 	protected void activate(final ComponentContext context) {
 		contextRegistry = (IRuntimeContextRegistry) context.locateService("IRuntimeContextRegistry");
 
@@ -108,17 +146,18 @@ public class BugSearchCommandComponent implements CommandProvider {
 	protected void deactivate(final ComponentContext context) {
 		// release references
 		contextRegistry = null;
-
 	}
 
 	@Override
 	public String getHelp() {
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append("---BugSearch---\n");
-		buffer.append("\tbsindex <bug id> - indexes a specific bug\n");
-		buffer.append("\tbsoptimize - kicks off indexing optimization\n");
-		buffer.append("\tbsreindex  - kicks off re-indexing of the whole bugs index\n");
-		buffer.append("\tbscancelImport\n");
+		buffer.append("\tbsIndex <bug id> - indexes a specific bug\n");
+		buffer.append("\tbsOptimize - kicks off indexing optimization\n");
+		buffer.append("\tbsReindex  - kicks off re-indexing of the whole bugs index\n");
+		buffer.append("\tbsCancelImport\n");
+		buffer.append("\tbsConcurrency\n");
+		buffer.append("\tbsStatus\n");
 		return buffer.toString();
 	}
 
