@@ -110,6 +110,10 @@ public final class DocumentsPublisher extends TaskDataCollector {
 		bugsCount.incrementAndGet();
 	}
 
+	public void cancel() {
+		executorService.shutdownNow();
+	}
+
 	private Collection<String> extractKeywords(final ITaskMapping taskMapping) {
 		final Set<String> keywords = new LinkedHashSet<String>();
 		for (final String keyword : taskMapping.getKeywords()) {
@@ -146,6 +150,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	void publishTask(final String taskId) {
 		try {
 			if (cancelMonitor.isCanceled()) {
+				cancel();
 				return;
 			}
 
@@ -211,9 +216,11 @@ public final class DocumentsPublisher extends TaskDataCollector {
 			tags.addAll(extractSummaryTags(taskMapping.getSummary()));
 			setField(document, "tags", tags);
 
-			if (!cancelMonitor.isCanceled()) {
-				repository.add(document);
+			if (cancelMonitor.isCanceled()) {
+				cancel();
+				return;
 			}
+			repository.add(document);
 
 		} catch (final CoreException e) {
 			LOG.error("error while fetching bug data", e);
