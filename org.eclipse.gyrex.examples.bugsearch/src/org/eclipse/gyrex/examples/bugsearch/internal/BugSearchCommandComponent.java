@@ -15,18 +15,51 @@ import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
+import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchIndexJob;
+import org.eclipse.gyrex.examples.bugsearch.internal.indexing.DocumentsPublisher;
+import org.eclipse.gyrex.examples.bugsearch.internal.indexing.OptimizeIndexJob;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 
 import org.osgi.service.component.ComponentContext;
 
+import org.apache.commons.lang.math.NumberUtils;
+
 /**
  * Console commands
  */
+@SuppressWarnings("restriction")
 public class BugSearchCommandComponent implements CommandProvider {
 
 	private IRuntimeContextRegistry contextRegistry;
+
+	public void _bsindex(final CommandInterpreter ci) {
+		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
+		if (null == eclipseBugSearchContext) {
+			ci.println("Eclipse bug search context not found!");
+			return;
+		}
+
+		// get bug numbers
+		final int startId = NumberUtils.toInt(ci.nextArgument());
+		if (startId == 0) {
+			ci.println("Bug number must be greater 0!");
+			return;
+		}
+
+		// schedule indexing
+		new BugSearchIndexJob("bug indexing", eclipseBugSearchContext) {
+			@Override
+			protected void doIndex(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
+				queryForBugsRange(monitor, repository, connector, publisher, startId, 1);
+			}
+		}.schedule(5000);
+		ci.println("Scheduled indexing bug " + startId + ".");
+	}
 
 	public void _bsoptimize(final CommandInterpreter ci) {
 		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
@@ -87,8 +120,9 @@ public class BugSearchCommandComponent implements CommandProvider {
 	public String getHelp() {
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append("---BugSearch---\n");
-		buffer.append("\tbsreindex  - kicks off re-indexing of the whole bugs index\n");
+		buffer.append("\tbsindex <bug id> - indexes a specific bug\n");
 		buffer.append("\tbsoptimize - kicks off indexing optimization\n");
+		buffer.append("\tbsreindex  - kicks off re-indexing of the whole bugs index\n");
 		return buffer.toString();
 	}
 

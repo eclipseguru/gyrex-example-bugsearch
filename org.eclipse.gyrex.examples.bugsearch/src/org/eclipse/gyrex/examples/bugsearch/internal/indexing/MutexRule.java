@@ -9,7 +9,7 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  */
-package org.eclipse.gyrex.examples.bugsearch.internal;
+package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 

@@ -9,11 +9,12 @@
  * Contributors:
  *     Gunnar Wagenknecht - initial API and implementation
  *******************************************************************************/
-package org.eclipse.gyrex.examples.bugsearch.internal;
+package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
 import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.context.IRuntimeContext;
+import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 
@@ -39,7 +40,7 @@ public class OptimizeIndexJob extends Job {
 	 * @param context
 	 * @param name
 	 */
-	OptimizeIndexJob(final IRuntimeContext context) {
+	public OptimizeIndexJob(final IRuntimeContext context) {
 		super("fan shop index optimize");
 		this.context = context;
 		setPriority(LONG);

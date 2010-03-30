@@ -16,7 +16,8 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gyrex.context.IRuntimeContext;
-import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchDataImport.Mode;
+import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchDataImport;
+import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchDataImport.Mode;
 
 /**
  *
