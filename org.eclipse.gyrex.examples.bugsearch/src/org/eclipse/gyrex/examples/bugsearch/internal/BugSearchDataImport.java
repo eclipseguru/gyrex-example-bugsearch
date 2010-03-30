@@ -39,7 +39,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaAttribute;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaCorePlugin;
@@ -274,26 +273,6 @@ public class BugSearchDataImport extends Job {
 
 	static enum Mode {
 		INITIAL, UPDATE
-	}
-
-	private static class MutexRule implements ISchedulingRule {
-
-		private final Object object;
-
-		public MutexRule(final Object object) {
-			this.object = object;
-		}
-
-		public boolean contains(final ISchedulingRule rule) {
-			return rule == this;
-		}
-
-		public boolean isConflicting(final ISchedulingRule rule) {
-			if (rule instanceof MutexRule) {
-				return object.equals(((MutexRule) rule).object);
-			}
-			return false;
-		}
 	}
 
 	private static final Logger LOG = LoggerFactory.getLogger(BugSearchDataImport.class);
