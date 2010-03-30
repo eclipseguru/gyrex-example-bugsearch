@@ -146,7 +146,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	void publishTask(final String taskId) {
 		try {
 			if (cancelMonitor.isCanceled()) {
-				throw new OperationCanceledException();
+				return;
 			}
 
 			LOG.debug("Processing bug {}", taskId);
@@ -211,7 +211,9 @@ public final class DocumentsPublisher extends TaskDataCollector {
 			tags.addAll(extractSummaryTags(taskMapping.getSummary()));
 			setField(document, "tags", tags);
 
-			repository.add(document);
+			if (!cancelMonitor.isCanceled()) {
+				repository.add(document);
+			}
 
 		} catch (final CoreException e) {
 			LOG.error("error while fetching bug data", e);
