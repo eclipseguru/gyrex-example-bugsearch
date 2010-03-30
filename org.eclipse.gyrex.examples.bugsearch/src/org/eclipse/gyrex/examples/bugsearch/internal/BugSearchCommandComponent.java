@@ -37,6 +37,11 @@ public class BugSearchCommandComponent implements CommandProvider {
 
 	private IRuntimeContextRegistry contextRegistry;
 
+	public void _bscancelImport(final CommandInterpreter ci) {
+		BugzillaUpdateScheduler.cancelImportJob();
+		ci.println("Canceld update job.");
+	}
+
 	public void _bsindex(final CommandInterpreter ci) {
 		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
 		if (null == eclipseBugSearchContext) {
@@ -68,19 +73,9 @@ public class BugSearchCommandComponent implements CommandProvider {
 			return;
 		}
 
-		// reset the index counter if we created a new index
-		final IRuntimeContextPreferences preferences = PreferencesUtil.getPreferences(eclipseBugSearchContext);
-		preferences.remove(BugSearchActivator.PLUGIN_ID, "import.start");
-		try {
-			preferences.flush(BugSearchActivator.PLUGIN_ID);
-		} catch (final Exception e) {
-			ci.println("Error while flushing preferences after resetting the index counter: " + e);
-			// but continue
-		}
-
-		// re-schedule initial indexing
-		BugzillaUpdateScheduler.rescheduleInitialImportFollowedByUpdate();
-		ci.println("Rescheduled indexing.");
+		// schedule optimization
+		new OptimizeIndexJob(eclipseBugSearchContext).schedule(5000);
+		ci.println("Scheduled index optimization.");
 	}
 
 	public void _bsreindex(final CommandInterpreter ci) {
@@ -100,9 +95,9 @@ public class BugSearchCommandComponent implements CommandProvider {
 			// but continue
 		}
 
-		// schedule optimization
-		new OptimizeIndexJob(eclipseBugSearchContext).schedule(5000);
-		ci.println("Scheduled index optimization.");
+		// re-schedule initial indexing
+		BugzillaUpdateScheduler.rescheduleInitialImportFollowedByUpdate();
+		ci.println("Rescheduled indexing.");
 	}
 
 	protected void activate(final ComponentContext context) {
@@ -123,6 +118,7 @@ public class BugSearchCommandComponent implements CommandProvider {
 		buffer.append("\tbsindex <bug id> - indexes a specific bug\n");
 		buffer.append("\tbsoptimize - kicks off indexing optimization\n");
 		buffer.append("\tbsreindex  - kicks off re-indexing of the whole bugs index\n");
+		buffer.append("\tbscancelImport\n");
 		return buffer.toString();
 	}
 

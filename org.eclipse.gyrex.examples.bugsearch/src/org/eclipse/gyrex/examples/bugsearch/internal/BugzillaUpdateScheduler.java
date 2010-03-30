@@ -13,11 +13,12 @@ package org.eclipse.gyrex.examples.bugsearch.internal;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchDataImport;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchDataImport.Mode;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 
 /**
  *
@@ -26,6 +27,14 @@ public class BugzillaUpdateScheduler {
 
 	private static BugSearchDataImport initialImport;
 	private static BugSearchDataImport update;
+
+	public static synchronized void cancelImportJob() {
+		if (null == initialImport) {
+			return;
+		}
+
+		initialImport.cancel();
+	}
 
 	public static synchronized void cancelUpdateJob() {
 		if (null == update) {
