@@ -62,7 +62,7 @@ public class BugSearchRestServlet extends HttpServlet {
 		void enhanceWithinObject(JsonGenerator json) throws IOException;
 	}
 
-	private static final String[] AUTO_COMPLETE_ATTRIBUTES = StringUtils.split("id,title,reporter,keyword,product,component,score,status,resolution", ',');
+	private static final String[] AUTO_COMPLETE_ATTRIBUTES = StringUtils.split("id,uripath,title,reporter,keyword,product,component,score,status,resolution", ',');
 
 	private static final String ID_PATH_PREFIX = "/_id/";
 	private static final String AUTOCOMPLETE_PATH_PREFIX = "/_autocomplete/";
