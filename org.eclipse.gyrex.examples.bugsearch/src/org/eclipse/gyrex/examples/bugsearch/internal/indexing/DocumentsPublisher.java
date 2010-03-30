@@ -43,6 +43,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("restriction")
 public final class DocumentsPublisher extends TaskDataCollector {
 
 	/**
