@@ -43,7 +43,7 @@ public class BugSearchDataImport extends BugSearchIndexJob {
 	 * @param name
 	 */
 	public BugSearchDataImport(final IRuntimeContext context, final Mode mode, final long interval, final TimeUnit unit) {
-		super("fan shop data import", context);
+		super("data import", context);
 		this.mode = mode;
 		this.interval = interval;
 		this.unit = unit;

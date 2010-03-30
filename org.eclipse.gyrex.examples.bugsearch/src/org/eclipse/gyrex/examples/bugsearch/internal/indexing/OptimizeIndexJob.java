@@ -21,7 +21,8 @@ import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
+import org.eclipse.mylyn.tasks.core.TaskRepository;
 
 import org.osgi.framework.Bundle;
 
@@ -29,10 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("restriction")
-public class OptimizeIndexJob extends Job {
+public class OptimizeIndexJob extends BugSearchIndexJob {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
-	private final IRuntimeContext context;
 
 	/**
 	 * Creates a new instance.
@@ -41,19 +41,17 @@ public class OptimizeIndexJob extends Job {
 	 * @param name
 	 */
 	public OptimizeIndexJob(final IRuntimeContext context) {
-		super("fan shop index optimize");
-		this.context = context;
+		super("index optimize", context);
 		setPriority(LONG);
 		setRule(new MutexRule(context.getContextPath().toString().intern()));
 	}
 
-	/**
-	 * Returns the context.
-	 * 
-	 * @return the context
+	/* (non-Javadoc)
+	 * @see org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchIndexJob#doIndex(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.mylyn.tasks.core.TaskRepository, org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector, org.eclipse.gyrex.examples.bugsearch.internal.indexing.DocumentsPublisher)
 	 */
-	public IRuntimeContext getContext() {
-		return context;
+	@Override
+	protected void doIndex(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
+		// not used
 	}
 
 	@Override
