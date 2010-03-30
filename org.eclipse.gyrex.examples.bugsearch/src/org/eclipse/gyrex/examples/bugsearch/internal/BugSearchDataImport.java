@@ -302,7 +302,7 @@ public class BugSearchDataImport extends Job {
 		this.interval = interval;
 		this.unit = unit;
 		setPriority(LONG);
-		setRule(new MutexRule(context));
+		setRule(new MutexRule(context.getContextPath().toString().intern()));
 	}
 
 	/**
