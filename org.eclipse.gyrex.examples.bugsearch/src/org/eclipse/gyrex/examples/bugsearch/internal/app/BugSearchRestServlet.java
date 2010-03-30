@@ -145,6 +145,9 @@ public class BugSearchRestServlet extends HttpServlet {
 			return;
 		}
 
+		// enable some basic caching (5min)
+		resp.setHeader("Cache-Control", "max-age=300, public");
+
 		final IListingService listingService = ServiceUtil.getService(IListingService.class, getContext());
 		final ListingQuery query = new ListingQuery();
 		boolean isSingle = false;
@@ -245,6 +248,7 @@ public class BugSearchRestServlet extends HttpServlet {
 	private void doHelp(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		resp.setContentType("text/plain");
 		resp.setCharacterEncoding("UTF-8");
+		resp.setHeader("Cache-Control", "max-age=3600, public");
 		final PrintWriter writer = resp.getWriter();
 		writer.println("REST Servlet Usage");
 		writer.println("==================");
