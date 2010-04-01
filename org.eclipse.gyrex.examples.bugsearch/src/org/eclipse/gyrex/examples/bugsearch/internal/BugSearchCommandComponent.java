@@ -11,6 +11,8 @@
  */
 package org.eclipse.gyrex.examples.bugsearch.internal;
 
+import org.eclipse.gyrex.cds.model.IListingManager;
+import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
@@ -19,6 +21,8 @@ import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchDataImpor
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchIndexJob;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.DocumentsPublisher;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.OptimizeIndexJob;
+import org.eclipse.gyrex.model.common.ModelUtil;
+import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -103,6 +107,28 @@ public class BugSearchCommandComponent implements CommandProvider {
 			}
 		}.schedule(5000);
 		ci.println("Scheduled indexing changes during last " + hours + " hours.");
+	}
+
+	public void _bsMetrics(final CommandInterpreter ci) {
+		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
+		if (null == eclipseBugSearchContext) {
+			ci.println("Eclipse bug search context not found!");
+			return;
+		}
+
+		final IListingManager listingManager = ModelUtil.getManager(IListingManager.class, eclipseBugSearchContext);
+		final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) listingManager).getAdapter(SolrRepository.class);
+		if (null == solrRepository) {
+			ci.println("Bug search Solr repository not found!");
+			return;
+		}
+
+		ci.println();
+		ci.println();
+		ci.println("Bug Search Solr Repository Metrics");
+		ci.println("----------------------------------");
+		ci.println(solrRepository.getSolrRepositoryMetrics());
+
 	}
 
 	public void _bsOptimize(final CommandInterpreter ci) {
