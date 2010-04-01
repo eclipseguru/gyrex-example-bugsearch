@@ -183,7 +183,6 @@ public abstract class BugSearchIndexJob extends Job {
 
 				// finish publishing
 				publisher.shutdown();
-				publisher = null;
 
 				LOG.debug("Published " + publisher.getBugsCount() + " bugs.");
 
@@ -191,6 +190,7 @@ public abstract class BugSearchIndexJob extends Job {
 				solrRepository.commit(true, false);
 			} finally {
 				//CommonsNetPlugin.getExecutorService().shutdown();
+				publisher = null;
 			}
 			// publish the docs
 			//listingManager.publish(docs.values());
