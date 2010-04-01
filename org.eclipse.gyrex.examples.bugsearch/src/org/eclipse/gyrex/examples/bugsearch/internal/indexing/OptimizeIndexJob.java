@@ -90,7 +90,7 @@ public class OptimizeIndexJob extends BugSearchIndexJob {
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + " " + getJobStateAsString(getState());
+	protected String toStringDetail() {
+		return "";
 	}
 }

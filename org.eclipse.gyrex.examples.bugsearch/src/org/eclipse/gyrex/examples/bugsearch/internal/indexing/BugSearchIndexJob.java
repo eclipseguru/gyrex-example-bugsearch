@@ -208,6 +208,10 @@ public abstract class BugSearchIndexJob extends Job {
 
 	@Override
 	public String toString() {
-		return super.toString() + " " + getJobStateAsString(getState()) + " " + publisher;
+		return super.toString() + " " + getJobStateAsString(getState()) + " " + toStringDetail();
+	}
+
+	protected String toStringDetail() {
+		return String.valueOf(publisher);
 	}
 }

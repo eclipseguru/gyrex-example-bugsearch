@@ -17,8 +17,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.gyrex.cds.model.IListingManager;
@@ -73,7 +73,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	/** bugsCount */
 	private final AtomicInteger bugsCount;
 	private final TaskRepository taskRepository;
-	private final ExecutorService executorService;
+	private final ThreadPoolExecutor executorService;
 	private final IProgressMonitor cancelMonitor;
 	private final AtomicInteger openTasks;
 
@@ -92,7 +92,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 		this.repository = repository;
 		this.cancelMonitor = cancelMonitor;
 		bugsCount = new AtomicInteger();
-		executorService = Executors.newFixedThreadPool(BugSearchIndexJob.PARALLEL_THREADS);
+		executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(BugSearchIndexJob.PARALLEL_THREADS);
 		openTasks = new AtomicInteger();
 	}
 
@@ -271,7 +271,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("[bugsCount=").append(bugsCount).append(", openTasks=").append(openTasks).append("]");
+		builder.append("[bugsCount=").append(bugsCount).append(", openTasks=").append(openTasks).append(", completedTasks=").append(executorService.getCompletedTaskCount()).append(", activeThreads=").append(executorService.getActiveCount()).append("]");
 		return builder.toString();
 	}
 
