@@ -158,10 +158,9 @@ public class BugSearchCommandComponent implements CommandProvider {
 		ci.println("----------------------------------");
 		ci.println();
 		ci.println(" Stats since: " + statsSince);
-		ci.println();
 		ci.println("      Status: " + metrics.getStatusMetric().getStatus() + " (" + metrics.getStatusMetric().getStatusChangeReason() + ")");
 		ci.println();
-		ci.println("There were " + metrics.getErrorMetric().getTotalNumberOfErrors() + " errors.");
+		ci.println(" There were " + metrics.getErrorMetric().getTotalNumberOfErrors() + " errors.");
 		if (metrics.getErrorMetric().getTotalNumberOfErrors() > 0) {
 			ci.println("  Last error: " + metrics.getErrorMetric().getLastError() + " at " + metrics.getErrorMetric().getLastErrorChangeTime() + " (" + metrics.getErrorMetric().getLastErrorDetails() + ")");
 			ci.println();
@@ -170,10 +169,10 @@ public class BugSearchCommandComponent implements CommandProvider {
 			}
 		}
 		ci.println();
-		ci.println("Processed " + metrics.getQueryThroughputMetric().getRequestsStatsProcessed() + " queries with an average of " + metrics.getQueryThroughputMetric().getRequestsStatsProcessingTimeAverage() + "ms per query.");
-		ci.println("Rate of failed queries is at " + NUMBER_FORMAT.format(metrics.getQueryThroughputMetric().getRequestsStatsFailureRate()) + "%.");
-		ci.println("There were at most " + metrics.getQueryThroughputMetric().getRequestsStatsHigh() + " parallel queries running.");
-		ci.println("We had an average of " + metrics.getQueryThroughputMetric().getRequestsStatsHitRatePerHour() + " queries per hour.");
+		ci.println(" Processed " + metrics.getQueryThroughputMetric().getRequestsStatsProcessed() + " queries with an average of " + metrics.getQueryThroughputMetric().getRequestsStatsProcessingTimeAverage() + "ms per query.");
+		ci.println(" Rate of failed queries is at " + NUMBER_FORMAT.format(metrics.getQueryThroughputMetric().getRequestsStatsFailureRate()) + "%.");
+		ci.println(" There were at most " + metrics.getQueryThroughputMetric().getRequestsStatsHigh() + " parallel queries running.");
+		ci.println(" We had an average of " + metrics.getQueryThroughputMetric().getRequestsStatsHitRatePerHour() + " queries per hour.");
 		ci.println();
 		ci.println();
 	}
