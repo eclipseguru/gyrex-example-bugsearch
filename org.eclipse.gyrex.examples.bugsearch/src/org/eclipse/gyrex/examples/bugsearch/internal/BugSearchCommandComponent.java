@@ -102,7 +102,7 @@ public class BugSearchCommandComponent implements CommandProvider {
 				queryForChanges(monitor, repository, connector, publisher, hours + "h", BugSearchDataImport.NOW);
 			}
 		}.schedule(5000);
-		ci.println("Scheduled indexing bug " + hours + ".");
+		ci.println("Scheduled indexing changes during last " + hours + " hours.");
 	}
 
 	public void _bsOptimize(final CommandInterpreter ci) {
