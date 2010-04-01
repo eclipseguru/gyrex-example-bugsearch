@@ -205,4 +205,9 @@ public abstract class BugSearchIndexJob extends Job {
 
 		return Status.OK_STATUS;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " " + getJobStateAsString(getState()) + " " + publisher;
+	}
 }
