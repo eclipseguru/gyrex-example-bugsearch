@@ -11,7 +11,10 @@
  */
 package org.eclipse.gyrex.examples.bugsearch.internal;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
@@ -45,7 +48,11 @@ import org.apache.commons.lang.math.NumberUtils;
 @SuppressWarnings("restriction")
 public class BugSearchCommandComponent implements CommandProvider {
 
+	static final DateFormat ISO_8601_UTC = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+
 	private IRuntimeContextRegistry contextRegistry;
+	private final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
+	private final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
 
 	public void _bsCancelImport(final CommandInterpreter ci) {
 		BugzillaUpdateScheduler.cancelImportJob();
@@ -129,26 +136,44 @@ public class BugSearchCommandComponent implements CommandProvider {
 
 		final SolrRepositoryMetrics metrics = solrRepository.getSolrRepositoryMetrics();
 
+		final String nextArgument = ci.nextArgument();
+		if ("reset".equals(nextArgument)) {
+
+			metrics.resetStats();
+
+			ci.println("Bug Search Solr repository metrics have been resetted.");
+			return;
+		}
+
+		String statsSince;
+		try {
+			statsSince = DATE_FORMAT.format(ISO_8601_UTC.parse(metrics.getStatsSince()));
+		} catch (final ParseException e) {
+			statsSince = metrics.getStatsSince();
+		}
+
 		ci.println();
 		ci.println();
 		ci.println("Bug Search Solr Repository Metrics");
 		ci.println("----------------------------------");
 		ci.println();
-		ci.println(" Stats since:" + metrics.getStatsSince());
+		ci.println(" Stats since: " + statsSince);
 		ci.println();
-		ci.println("      Status:" + metrics.getStatusMetric().getStatus() + " (" + metrics.getStatusMetric().getStatusChangeReason() + ")");
+		ci.println("      Status: " + metrics.getStatusMetric().getStatus() + " (" + metrics.getStatusMetric().getStatusChangeReason() + ")");
 		ci.println();
-		ci.println("      Errors:" + metrics.getErrorMetric().getTotalNumberOfErrors() + " since " + metrics.getErrorMetric().getStatsSince());
-		ci.println("  Last error:" + metrics.getErrorMetric().getLastError() + " on " + metrics.getErrorMetric().getLastErrorChangeTime() + " (" + metrics.getErrorMetric().getLastErrorDetails() + ")");
-		ci.println();
-		for (final ErrorStats errorStats : metrics.getErrorMetric().getErrorStats()) {
-			ci.println(errorStats);
+		ci.println("There were " + metrics.getErrorMetric().getTotalNumberOfErrors() + " errors.");
+		if (metrics.getErrorMetric().getTotalNumberOfErrors() > 0) {
+			ci.println("  Last error: " + metrics.getErrorMetric().getLastError() + " at " + metrics.getErrorMetric().getLastErrorChangeTime() + " (" + metrics.getErrorMetric().getLastErrorDetails() + ")");
+			ci.println();
+			for (final ErrorStats errorStats : metrics.getErrorMetric().getErrorStats()) {
+				ci.println(errorStats);
+			}
 		}
 		ci.println();
 		ci.println("Processed " + metrics.getQueryThroughputMetric().getRequestsStatsProcessed() + " queries with an average of " + metrics.getQueryThroughputMetric().getRequestsStatsProcessingTimeAverage() + "ms per query.");
-		ci.println("Rate of failed queries is at " + NumberFormat.getNumberInstance().format(metrics.getQueryThroughputMetric().getRequestsStatsFailureRate()) + "%.");
+		ci.println("Rate of failed queries is at " + NUMBER_FORMAT.format(metrics.getQueryThroughputMetric().getRequestsStatsFailureRate()) + "%.");
 		ci.println("There were at most " + metrics.getQueryThroughputMetric().getRequestsStatsHigh() + " parallel queries running.");
-		ci.println("So far, we had an average of " + metrics.getQueryThroughputMetric().getRequestsStatsHitRatePerHour() + " queries per hour since " + metrics.getQueryThroughputMetric().getStatsSince() + ".");
+		ci.println("We had an average of " + metrics.getQueryThroughputMetric().getRequestsStatsHitRatePerHour() + " queries per hour.");
 		ci.println();
 		ci.println();
 	}
