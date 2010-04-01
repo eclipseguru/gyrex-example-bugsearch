@@ -30,21 +30,11 @@
 
   <!-- the default high-performance update handler -->
   <query>
-    <filterCache
-      class="solr.LRUCache"
-      size="2000000"
-      initialSize="1000000"
-      autowarmCount="128"/>
-    <queryResultCache
-      class="solr.LRUCache"
-      size="512"
-      initialSize="512"
-      autowarmCount="32"/>
-    <documentCache
-      class="solr.LRUCache"
-      size="400000"
-      initialSize="512"
-      autowarmCount="0"/>
+
+    <filterCache class="solr.LRUCache" size="65536" initialSize="4096" autowarmCount="4096"/>
+    <queryResultCache class="solr.LRUCache" size="16384" initialSize="4096" autowarmCount="1024"/>
+    <documentCache class="solr.LRUCache" size="16384" initialSize="16384" autowarmCount="0"/>
+
     <enableLazyFieldLoading>true</enableLazyFieldLoading>
     <useFilterForSortedQuery>true</useFilterForSortedQuery>
     <queryResultWindowSize>50</queryResultWindowSize>
@@ -53,18 +43,40 @@
 
     <listener event="newSearcher" class="solr.QuerySenderListener">
       <arr name="queries">
-        <lst><str name="q">*:*</str> <str name="start">0</str> <str name="rows">200</str> </lst>
+        <!-- seed common sort fields -->
+        <lst> <str name="q">*:*</str> </lst>
       </arr>
     </listener>
-
     <listener event="firstSearcher" class="solr.QuerySenderListener">
       <arr name="queries">
-        <lst><str name="q">*:*</str> <str name="start">0</str> <str name="rows">200</str> </lst>
+        <!-- seed common sort fields -->
+        <lst> <str name="q">*:*</str> </lst>
+        <!-- seed common facets and filter queries -->
+        <lst> <str name="q">*:*</str>
+              <str name="facet.field">classification_facet</str>
+              <str name="facet.field">product_facet</str>
+              <str name="facet.field">component_facet</str>
+              <str name="facet.field">keywords_facet</str>
+              <str name="facet.field">tags_facet</str>
+              <str name="facet.field">status_facet</str>
+              <str name="facet.field">resolution_facet</str>
+              <str name="facet.field">targetMilestone_facet</str>
+              <str name="facet.field">version_facet</str>
+              <str name="facet.field">statusWhiteboard_facet</str>
+              <str name="facet.field">priority_facet</str>
+              <str name="facet.field">severity_facet</str>
+              <str name="facet.field">hardware_facet</str>
+              <str name="facet.field">os_facet</str>
+              <str name="facet.field">assignee_facet</str>
+              <str name="facet.field">reporter_facet</str>
+              <str name="facet.field">cc_facet</str>
+              <str name="facet.field">commenter_facet</str>
+        </lst>
       </arr>
     </listener>
 
     <useColdSearcher>false</useColdSearcher>
-    <!-- <maxWarmingSearchers>2</maxWarmingSearchers> -->
+    <maxWarmingSearchers>2</maxWarmingSearchers>
 
   </query>
 
