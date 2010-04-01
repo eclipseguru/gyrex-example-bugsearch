@@ -15,6 +15,7 @@ import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
+import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchDataImport;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchIndexJob;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.DocumentsPublisher;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.OptimizeIndexJob;
@@ -35,21 +36,6 @@ import org.apache.commons.lang.math.NumberUtils;
  */
 @SuppressWarnings("restriction")
 public class BugSearchCommandComponent implements CommandProvider {
-
-	private static String getJobStateAsString(final int state) {
-		switch (state) {
-			case Job.RUNNING:
-				return "RUNNING";
-			case Job.WAITING:
-				return "WAITING";
-			case Job.SLEEPING:
-				return "SLEEPING";
-			case Job.NONE:
-				return "NONE";
-			default:
-				return "(unknown)";
-		}
-	}
 
 	private IRuntimeContextRegistry contextRegistry;
 
@@ -74,22 +60,49 @@ public class BugSearchCommandComponent implements CommandProvider {
 
 		// get bug number
 		final int startId = NumberUtils.toInt(ci.nextArgument());
-		if (startId == 0) {
+		if (startId <= 0) {
 			ci.println("Bug number must be greater 0!");
 			return;
 		}
 
 		// get (optional) fetch length
 		final int length = NumberUtils.toInt(ci.nextArgument(), 1);
-
+		if (length <= 0) {
+			ci.println("Length must be greater 0!");
+			return;
+		}
 		// schedule indexing
-		new BugSearchIndexJob("bug indexing", eclipseBugSearchContext) {
+		new BugSearchIndexJob("indexing bugs " + startId + " to " + (startId + length - 1), eclipseBugSearchContext) {
 			@Override
 			protected void doIndex(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
 				queryForBugsRange(monitor, repository, connector, publisher, startId, length);
 			}
 		}.schedule(5000);
 		ci.println("Scheduled indexing bug " + startId + ".");
+	}
+
+	public void _bsIndexChanges(final CommandInterpreter ci) {
+		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
+		if (null == eclipseBugSearchContext) {
+			ci.println("Eclipse bug search context not found!");
+			return;
+		}
+
+		// get bug number
+		final int hours = NumberUtils.toInt(ci.nextArgument());
+		if (hours <= 0) {
+			ci.println("Hours number must be greater 0!");
+			return;
+		}
+
+		// schedule indexing
+		new BugSearchIndexJob("indexing changes during last " + hours + " hours", eclipseBugSearchContext) {
+			@Override
+			protected void doIndex(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
+				queryForChanges(monitor, repository, connector, publisher, hours + "h", BugSearchDataImport.NOW);
+			}
+		}.schedule(5000);
+		ci.println("Scheduled indexing bug " + hours + ".");
 	}
 
 	public void _bsOptimize(final CommandInterpreter ci) {
@@ -134,7 +147,7 @@ public class BugSearchCommandComponent implements CommandProvider {
 		}
 
 		for (final Job job : jobs) {
-			ci.println(job + " " + getJobStateAsString(job.getState()));
+			ci.println(job);
 		}
 	}
 
@@ -158,6 +171,8 @@ public class BugSearchCommandComponent implements CommandProvider {
 		buffer.append("\tbsCancelImport\n");
 		buffer.append("\tbsConcurrency\n");
 		buffer.append("\tbsStatus\n");
+		buffer.append("\tbsCommit\n");
+		buffer.append("\tbsIndexChanges <hours> - indexes changes from the last X hours\n");
 		return buffer.toString();
 	}
 

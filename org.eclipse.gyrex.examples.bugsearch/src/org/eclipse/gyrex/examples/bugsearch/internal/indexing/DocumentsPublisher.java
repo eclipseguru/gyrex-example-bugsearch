@@ -45,9 +45,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("restriction")
 public final class DocumentsPublisher extends TaskDataCollector {
 
-	/**
-		 *
-		 */
 	private final class PublishTaskRunnable implements Runnable {
 		/** taskId */
 		private final String taskId;
@@ -72,6 +69,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	/** connector */
 	private final BugzillaRepositoryConnector connector;
 	private final SolrRepository repository;
+
 	/** bugsCount */
 	private final AtomicInteger bugsCount;
 	private final TaskRepository taskRepository;
@@ -111,6 +109,10 @@ public final class DocumentsPublisher extends TaskDataCollector {
 
 	public void cancel() {
 		executorService.shutdownNow();
+	}
+
+	public void commit() {
+		repository.commit(false, false);
 	}
 
 	private Collection<String> extractKeywords(final ITaskMapping taskMapping) {
@@ -265,4 +267,12 @@ public final class DocumentsPublisher extends TaskDataCollector {
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("[bugsCount=").append(bugsCount).append(", openTasks=").append(openTasks).append("]");
+		return builder.toString();
+	}
+
 }

@@ -45,11 +45,28 @@ import org.slf4j.LoggerFactory;
 public abstract class BugSearchIndexJob extends Job {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BugSearchIndexJob.class);
-	private final IRuntimeContext context;
 
+	protected static String getJobStateAsString(final int state) {
+		switch (state) {
+			case Job.RUNNING:
+				return "RUNNING";
+			case Job.WAITING:
+				return "WAITING";
+			case Job.SLEEPING:
+				return "SLEEPING";
+			case Job.NONE:
+				return "NONE";
+			default:
+				return "(unknown)";
+		}
+	}
+
+	private final IRuntimeContext context;
 	public static final Object FAMILY = new Object();
 	public static String URL = "https://bugs.eclipse.org/bugs/";
 	public static int PARALLEL_THREADS = 8;
+
+	private DocumentsPublisher publisher;
 
 	/**
 	 * Creates a new instance.
@@ -111,6 +128,7 @@ public abstract class BugSearchIndexJob extends Job {
 			processed = publisher.getBugsCount() - oldBugsCount;
 			start += processed;
 			oldBugsCount = publisher.getBugsCount();
+			publisher.commit();
 		} while ((processed > 0));//&& (oldBugsCount < 100000));
 
 		preferences.putInt(BugSearchActivator.PLUGIN_ID, "import.start", start - 1, false);
@@ -158,14 +176,14 @@ public abstract class BugSearchIndexJob extends Job {
 
 			try {
 
-				// process docs in batches
-				final DocumentsPublisher publisher = new DocumentsPublisher(repository, connector, listingManager, solrRepository, monitor);
+				publisher = new DocumentsPublisher(repository, connector, listingManager, solrRepository, monitor);
 
 				// fetch bugs and index
 				doIndex(monitor, repository, connector, publisher);
 
 				// finish publishing
 				publisher.shutdown();
+				publisher = null;
 
 				LOG.debug("Published " + publisher.getBugsCount() + " bugs.");
 

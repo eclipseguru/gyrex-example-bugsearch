@@ -30,9 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("restriction")
-public class OptimizeIndexJob extends BugSearchIndexJob {
+public class CommitIndexJob extends BugSearchIndexJob {
 
-	private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CommitIndexJob.class);
 
 	/**
 	 * Creates a new instance.
@@ -40,8 +40,8 @@ public class OptimizeIndexJob extends BugSearchIndexJob {
 	 * @param context
 	 * @param name
 	 */
-	public OptimizeIndexJob(final IRuntimeContext context) {
-		super("index optimize", context);
+	public CommitIndexJob(final IRuntimeContext context) {
+		super("commit index", context);
 		setPriority(LONG);
 		setRule(new MutexRule(context.getContextPath().toString().intern()));
 	}
@@ -70,12 +70,12 @@ public class OptimizeIndexJob extends BugSearchIndexJob {
 				return Status.CANCEL_STATUS;
 			}
 
-			LOG.debug("Begin optimization.");
+			LOG.debug("Begin commit.");
 
 			// optimize
-			solrRepository.optimize(true, true);
+			solrRepository.commit(true, true);
 
-			LOG.debug("Optimization finished.");
+			LOG.debug("Commit finished.");
 
 		} catch (final IllegalStateException e) {
 			// abort, bundle is inactive
