@@ -11,6 +11,8 @@
  */
 package org.eclipse.gyrex.examples.bugsearch.internal;
 
+import java.text.NumberFormat;
+
 import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.context.IRuntimeContext;
@@ -22,7 +24,9 @@ import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchIndexJob;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.DocumentsPublisher;
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.OptimizeIndexJob;
 import org.eclipse.gyrex.model.common.ModelUtil;
+import org.eclipse.gyrex.monitoring.metrics.ErrorMetric.ErrorStats;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
+import org.eclipse.gyrex.persistence.solr.internal.SolrRepositoryMetrics;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -123,12 +127,30 @@ public class BugSearchCommandComponent implements CommandProvider {
 			return;
 		}
 
+		final SolrRepositoryMetrics metrics = solrRepository.getSolrRepositoryMetrics();
+
 		ci.println();
 		ci.println();
 		ci.println("Bug Search Solr Repository Metrics");
 		ci.println("----------------------------------");
-		ci.println(solrRepository.getSolrRepositoryMetrics());
-
+		ci.println();
+		ci.println(" Stats since:" + metrics.getStatsSince());
+		ci.println();
+		ci.println("      Status:" + metrics.getStatusMetric().getStatus() + " (" + metrics.getStatusMetric().getStatusChangeReason() + ")");
+		ci.println();
+		ci.println("      Errors:" + metrics.getErrorMetric().getTotalNumberOfErrors() + " since " + metrics.getErrorMetric().getStatsSince());
+		ci.println("  Last error:" + metrics.getErrorMetric().getLastError() + " on " + metrics.getErrorMetric().getLastErrorChangeTime() + " (" + metrics.getErrorMetric().getLastErrorDetails() + ")");
+		ci.println();
+		for (final ErrorStats errorStats : metrics.getErrorMetric().getErrorStats()) {
+			ci.println(errorStats);
+		}
+		ci.println();
+		ci.println("Processed " + metrics.getQueryThroughputMetric().getRequestsStatsProcessed() + " queries with an average of " + metrics.getQueryThroughputMetric().getRequestsStatsProcessingTimeAverage() + "ms per query.");
+		ci.println("Rate of failed queries is at " + NumberFormat.getNumberInstance().format(metrics.getQueryThroughputMetric().getRequestsStatsFailureRate()) + "%.");
+		ci.println("There were at most " + metrics.getQueryThroughputMetric().getRequestsStatsHigh() + " parallel queries running.");
+		ci.println("So far, we had an average of " + metrics.getQueryThroughputMetric().getRequestsStatsHitRatePerHour() + " queries per hour since " + metrics.getQueryThroughputMetric().getStatsSince() + ".");
+		ci.println();
+		ci.println();
 	}
 
 	public void _bsOptimize(final CommandInterpreter ci) {
