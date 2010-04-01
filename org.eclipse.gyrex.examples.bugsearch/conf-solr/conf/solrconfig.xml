@@ -31,9 +31,9 @@
   <!-- the default high-performance update handler -->
   <query>
 
-    <filterCache class="solr.LRUCache" size="65536" initialSize="4096" autowarmCount="4096"/>
+    <filterCache class="solr.LRUCache" size="262144" initialSize="65536" autowarmCount="65536"/>
     <queryResultCache class="solr.LRUCache" size="16384" initialSize="4096" autowarmCount="1024"/>
-    <documentCache class="solr.LRUCache" size="16384" initialSize="16384" autowarmCount="0"/>
+    <documentCache class="solr.LRUCache" size="262144" initialSize="16384" autowarmCount="0"/>
 
     <enableLazyFieldLoading>true</enableLazyFieldLoading>
     <useFilterForSortedQuery>true</useFilterForSortedQuery>
