@@ -59,7 +59,7 @@ public class BugSearchActivator extends BaseBundleActivator {
 		contextRegistry = getServiceHelper().trackService(IRuntimeContextRegistry.class);
 
 		// register application provider
-		getServiceHelper().registerService(ApplicationProvider.class.getName(), new BugSearchApplicationProvider(), "Gyrex.net", "Application provider for the extensible Fan Shop application.", null, null);
+		getServiceHelper().registerService(ApplicationProvider.class.getName(), new BugSearchApplicationProvider(), "Eclipse Gyrex", "Application provider for the extensible Fan Shop application.", null, null);
 	}
 
 	/* (non-Javadoc)
