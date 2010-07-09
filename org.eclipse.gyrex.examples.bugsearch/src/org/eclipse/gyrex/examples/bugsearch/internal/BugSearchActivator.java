@@ -18,6 +18,7 @@ import org.eclipse.gyrex.common.services.IServiceProxy;
 import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
 import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
 import org.eclipse.gyrex.http.application.provider.ApplicationProvider;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.packageadmin.PackageAdmin;
@@ -48,9 +49,6 @@ public class BugSearchActivator extends BaseBundleActivator {
 		super(PLUGIN_ID);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.gyrex.common.runtime.BaseBundleActivator#doStart(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	protected void doStart(final BundleContext context) throws Exception {
 		instance.set(this);
@@ -62,9 +60,6 @@ public class BugSearchActivator extends BaseBundleActivator {
 		getServiceHelper().registerService(ApplicationProvider.class.getName(), new BugSearchApplicationProvider(), "Eclipse Gyrex", "Application provider for the extensible Fan Shop application.", null, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.gyrex.common.runtime.BaseBundleActivator#doStop(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	protected void doStop(final BundleContext context) throws Exception {
 		BugzillaUpdateScheduler.cancelUpdateJob();

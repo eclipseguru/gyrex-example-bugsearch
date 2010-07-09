@@ -44,18 +44,18 @@ public class BugSearchSetupStep extends ConfigurationWizardStep {
 	@Override
 	public void createPages(final WizardContainer wizard) {
 		final WizardPage wizardPage = new WizardPage("bugsearch-setup", wizard);
-		wizardPage.setTitle("The Eclipse Bug Search");
+		wizardPage.setLabel("The Eclipse Bug Search");
 		wizardPage.setDescription("Deploy the Eclipse Bug Search example application.");
 
 		final DialogFieldGroup enableFanShopGroup = new DialogFieldGroup("bugsearch-deployment", wizardPage, CWT.NONE);
-		enableFanShopGroup.setTitle("Deployment");
+		enableFanShopGroup.setLabel("Deployment");
 		enableFanShopGroup.setDescription("Select whether the Bug Search application should be deployed.");
 
 		final Checkbox deploy = new Checkbox("bugsearch-deploy", enableFanShopGroup, CWT.NONE);
 		deploy.setLabel("Deploy the Eclipse Bug Search demo application.");
 
 		final DialogFieldGroup container = new DialogFieldGroup("bugsearch-urls", wizardPage, CWT.NONE);
-		container.setTitle("Configuration");
+		container.setLabel("Configuration");
 		container.setDescription("Configure the KEY_URL the Bug Search application should be deployed to. Please make sure the domain name actually resolves to the machine Gyrex is running on.");
 		//container.setVisibilityRule(DialogFieldRules.field(deploy).isSet());
 
