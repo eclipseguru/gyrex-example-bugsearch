@@ -17,7 +17,7 @@ import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.examples.bugsearch.internal.IEclipseBugSearchConstants;
-import org.eclipse.gyrex.toolkit.CWT;
+import org.eclipse.gyrex.toolkit.Toolkit;
 import org.eclipse.gyrex.toolkit.content.BooleanContent;
 import org.eclipse.gyrex.toolkit.content.TextContent;
 import org.eclipse.gyrex.toolkit.runtime.commands.CommandExecutionEvent;
@@ -47,19 +47,19 @@ public class BugSearchSetupStep extends ConfigurationWizardStep {
 		wizardPage.setLabel("The Eclipse Bug Search");
 		wizardPage.setDescription("Deploy the Eclipse Bug Search example application.");
 
-		final DialogFieldGroup enableFanShopGroup = new DialogFieldGroup("bugsearch-deployment", wizardPage, CWT.NONE);
+		final DialogFieldGroup enableFanShopGroup = new DialogFieldGroup("bugsearch-deployment", wizardPage, Toolkit.NONE);
 		enableFanShopGroup.setLabel("Deployment");
 		enableFanShopGroup.setDescription("Select whether the Bug Search application should be deployed.");
 
-		final Checkbox deploy = new Checkbox("bugsearch-deploy", enableFanShopGroup, CWT.NONE);
+		final Checkbox deploy = new Checkbox("bugsearch-deploy", enableFanShopGroup, Toolkit.NONE);
 		deploy.setLabel("Deploy the Eclipse Bug Search demo application.");
 
-		final DialogFieldGroup container = new DialogFieldGroup("bugsearch-urls", wizardPage, CWT.NONE);
+		final DialogFieldGroup container = new DialogFieldGroup("bugsearch-urls", wizardPage, Toolkit.NONE);
 		container.setLabel("Configuration");
 		container.setDescription("Configure the KEY_URL the Bug Search application should be deployed to. Please make sure the domain name actually resolves to the machine Gyrex is running on.");
 		//container.setVisibilityRule(DialogFieldRules.field(deploy).isSet());
 
-		final TextInput urlInput = new TextInput("bugsearch-url", container, CWT.NONE);
+		final TextInput urlInput = new TextInput("bugsearch-url", container, Toolkit.NONE);
 		urlInput.setLabel("KEY_URL:");
 		urlInput.setDescription("Enter the KEY_URL the Bug Search application should be mounted on (eg. http://localhost/). ");
 		urlInput.setEnablementRule(DialogFieldRules.field(deploy).isSet());
