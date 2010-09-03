@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaCorePlugin;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
@@ -66,7 +67,7 @@ public abstract class BugSearchIndexJob extends Job {
 	public static String URL = "https://bugs.eclipse.org/bugs/";
 	public static int PARALLEL_THREADS = 8;
 
-	private DocumentsPublisher publisher;
+	private volatile DocumentsPublisher publisher;
 
 	/**
 	 * Creates a new instance.
@@ -83,6 +84,14 @@ public abstract class BugSearchIndexJob extends Job {
 	@Override
 	public boolean belongsTo(final Object family) {
 		return FAMILY == family;
+	}
+
+	@Override
+	protected void canceling() {
+		final DocumentsPublisher documentsPublisher = publisher;
+		if (null != documentsPublisher) {
+			documentsPublisher.cancel();
+		}
 	}
 
 	protected abstract void doIndex(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher);
@@ -149,12 +158,11 @@ public abstract class BugSearchIndexJob extends Job {
 		queryByUrl(monitor, repository, connector, publisher, url);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-	 */
 	@Override
-	protected IStatus run(final IProgressMonitor monitor) {
+	protected IStatus run(final IProgressMonitor progressMonitor) {
+		final SubMonitor monitor = SubMonitor.convert(progressMonitor, "Indexing Bugzilla...", 100);
 		try {
+			LOG.info("Started indexing...");
 
 			final Bundle bundle = BugSearchActivator.getInstance().getBundle();
 			if (null == bundle) {
@@ -176,18 +184,19 @@ public abstract class BugSearchIndexJob extends Job {
 
 			try {
 
-				publisher = new DocumentsPublisher(repository, connector, listingManager, solrRepository, monitor);
+				publisher = new DocumentsPublisher(repository, connector, listingManager, solrRepository);
 
 				// fetch bugs and index
-				doIndex(monitor, repository, connector, publisher);
+				doIndex(monitor.newChild(50), repository, connector, publisher);
 
 				// finish publishing
-				publisher.shutdown();
+				publisher.waitForOpenTasks(monitor.newChild(10));
 
 				LOG.debug("Published " + publisher.getBugsCount() + " bugs.");
 
 				// commit
 				solrRepository.commit(true, false);
+				monitor.worked(10);
 			} finally {
 				//CommonsNetPlugin.getExecutorService().shutdown();
 				publisher = null;
@@ -199,8 +208,10 @@ public abstract class BugSearchIndexJob extends Job {
 			LOG.warn("Something is missing, cancelling job.", e);
 			return Status.CANCEL_STATUS;
 		} catch (final Exception e) {
-			e.printStackTrace();
-			return BugSearchActivator.getInstance().getStatusUtil().createError(0, e.getMessage(), e);
+			LOG.warn("Error during indexing. " + e.getMessage(), e);
+			return Status.CANCEL_STATUS;
+		} finally {
+			monitor.done();
 		}
 
 		return Status.OK_STATUS;

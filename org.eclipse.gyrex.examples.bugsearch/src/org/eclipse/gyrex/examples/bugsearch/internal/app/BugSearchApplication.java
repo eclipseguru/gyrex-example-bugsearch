@@ -43,16 +43,6 @@ public class BugSearchApplication extends Application {
 			// register the  listing servlet
 			//getApplicationServiceSupport().registerServlet("/", new ListingServlet(getContext()), null);
 			getApplicationServiceSupport().registerServlet("/query", new BugSearchRestServlet(getContext()), null);
-
-			// let's expose the Solr admin interface in dev mode
-			//			if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
-			//				getApplicationServiceSupport().registerServlet("/solr/admin/*.jsp", new SolrAdminJspServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
-			//				getApplicationServiceSupport().registerResources("/solr", "web", new BundleResourceProvider(BugSearchActivator.getInstance().getBundle("org.apache.solr.servlet")));
-			//
-			//				// let's expose the Solr request handler
-			//				getApplicationServiceSupport().registerServlet("/solr/select", new SolrServlet("/solr", SolrActivator.getInstance().getEmbeddedCoreContainer(), IEclipseBugSearchConstants.REPOSITORY_ID), null);
-			//
-			//			}
 		} catch (final ServletException e) {
 			throw new CoreException(BugSearchActivator.getInstance().getStatusUtil().createError(0, e.getMessage(), e));
 		}

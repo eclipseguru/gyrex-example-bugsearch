@@ -16,9 +16,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.gyrex.cds.model.IListingManager;
@@ -27,7 +31,6 @@ import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaAttribute;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
@@ -64,6 +67,9 @@ public final class DocumentsPublisher extends TaskDataCollector {
 		}
 	}
 
+	/** PROPERTY */
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
 	private static final Logger LOG = LoggerFactory.getLogger(DocumentsPublisher.class);
 
 	/** connector */
@@ -72,10 +78,11 @@ public final class DocumentsPublisher extends TaskDataCollector {
 
 	/** bugsCount */
 	private final AtomicInteger bugsCount;
+	private final AtomicInteger openTasks;
 	private final TaskRepository taskRepository;
 	private final ThreadPoolExecutor executorService;
-	private final IProgressMonitor cancelMonitor;
-	private final AtomicInteger openTasks;
+	private final AtomicBoolean isCanceled;
+	private final ConcurrentMap<String, String> activeTasks;
 
 	/**
 	 * Creates a new instance.
@@ -86,20 +93,21 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	 * @param batchSize
 	 * @param listingManager
 	 */
-	DocumentsPublisher(final TaskRepository taskRepository, final BugzillaRepositoryConnector connector, final IListingManager listingManager, final SolrRepository repository, final IProgressMonitor cancelMonitor) {
+	DocumentsPublisher(final TaskRepository taskRepository, final BugzillaRepositoryConnector connector, final IListingManager listingManager, final SolrRepository repository) {
 		this.taskRepository = taskRepository;
 		this.connector = connector;
 		this.repository = repository;
-		this.cancelMonitor = cancelMonitor;
 		bugsCount = new AtomicInteger();
 		executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(BugSearchIndexJob.PARALLEL_THREADS);
+		activeTasks = new ConcurrentHashMap<String, String>(BugSearchIndexJob.PARALLEL_THREADS);
 		openTasks = new AtomicInteger();
+		isCanceled = new AtomicBoolean();
 	}
 
 	@Override
 	public void accept(final TaskData partialTaskData) {
-		if (cancelMonitor.isCanceled()) {
-			throw new OperationCanceledException();
+		if (isCanceled()) {
+			return;
 		}
 		final String taskId = partialTaskData.getTaskId();
 		openTasks.incrementAndGet();
@@ -108,10 +116,17 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	}
 
 	public void cancel() {
-		executorService.shutdownNow();
+		final boolean wasCanceled = isCanceled.getAndSet(true);
+		if (!wasCanceled) {
+			executorService.shutdownNow();
+			LOG.info("Cancelledindexing at " + toString());
+		}
 	}
 
 	public void commit() {
+		if (isCanceled()) {
+			return;
+		}
 		repository.commit(false, false);
 	}
 
@@ -148,18 +163,23 @@ public final class DocumentsPublisher extends TaskDataCollector {
 		return bugsCount.get();
 	}
 
+	public boolean isCanceled() {
+		return isCanceled.get();
+	}
+
 	void publishTask(final String taskId) {
 		try {
-			if (cancelMonitor.isCanceled()) {
-				cancel();
+			if (isCanceled()) {
 				return;
 			}
 
 			LOG.debug("Processing bug {}", taskId);
 
+			activeTasks.put(taskId, "Fetching task data...");
 			final TaskData taskData = connector.getTaskData(taskRepository, taskId, new NullProgressMonitor());
 
 			// access task information
+			activeTasks.put(taskId, "Access task information...");
 			final ITaskMapping taskMapping = connector.getTaskMapping(taskData);
 
 			final SolrInputDocument document = new SolrInputDocument();
@@ -217,23 +237,24 @@ public final class DocumentsPublisher extends TaskDataCollector {
 			tags.addAll(extractSummaryTags(taskMapping.getSummary()));
 			setField(document, "tags", tags);
 
-			if (cancelMonitor.isCanceled()) {
-				cancel();
+			if (isCanceled()) {
 				return;
 			}
+			activeTasks.put(taskId, "Adding to index...");
 			repository.add(document);
 
 		} catch (final Exception e) {
-			LOG.error("error while fetching bug data: " + e.getMessage(), e);
+			LOG.warn("error while fetching bug data: " + e.getMessage());
 
 			// reschedule
-			if (!cancelMonitor.isCanceled()) {
+			if (!isCanceled()) {
 				openTasks.incrementAndGet();
 				executorService.execute(new PublishTaskRunnable(taskId));
-				LOG.error("rescheduled bug " + taskId + " for indexing because of previous error");
+				LOG.info("rescheduled bug " + taskId + " for indexing because of previous error");
 			}
 		} finally {
 			openTasks.decrementAndGet();
+			activeTasks.remove(taskId);
 		}
 	}
 
@@ -257,22 +278,36 @@ public final class DocumentsPublisher extends TaskDataCollector {
 		}
 	}
 
-	public void shutdown() {
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("[bugsCount=").append(bugsCount).append(", openTasks=").append(openTasks).append(", completedTasks=").append(executorService.getCompletedTaskCount()).append(", activeThreads=").append(executorService.getActiveCount()).append("]");
+		final Object[] entries = activeTasks.entrySet().toArray();
+		if (entries.length > 0) {
+			builder.append(LINE_SEPARATOR);
+			for (final Object entryObject : entries) {
+				final Entry entry = (Entry) entryObject;
+				builder.append("\t").append(entry.getKey()).append(" - ").append(entry.getValue()).append(LINE_SEPARATOR);
+			}
+		}
+		return builder.toString();
+	}
+
+	public void waitForOpenTasks(final IProgressMonitor monitor) {
+		// ordered shutdown
 		executorService.shutdown();
-		while (openTasks.get() > 0) {
+		// wait for finish
+		while ((openTasks.get() > 0) && !monitor.isCanceled() && !isCanceled()) {
 			try {
 				Thread.sleep(1000);
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		}
+		// done
+		final int remaining = openTasks.get();
+		if (remaining > 0) {
+			LOG.info("Aborted waiting, " + remaining + " open task still remaining");
+		}
 	}
-
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("[bugsCount=").append(bugsCount).append(", openTasks=").append(openTasks).append(", completedTasks=").append(executorService.getCompletedTaskCount()).append(", activeThreads=").append(executorService.getActiveCount()).append("]");
-		return builder.toString();
-	}
-
 }
