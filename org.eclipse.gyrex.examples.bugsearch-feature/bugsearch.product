@@ -41,6 +41,8 @@
       <feature id="org.eclipse.gyrex.features.http" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.gyrex.features.kernel" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.gyrex.features.server" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.dependencies.persistence" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.modelandservices" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>
