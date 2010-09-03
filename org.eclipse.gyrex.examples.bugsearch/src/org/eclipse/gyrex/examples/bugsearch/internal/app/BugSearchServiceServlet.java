@@ -19,13 +19,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.gyrex.cds.model.IListing;
 import org.eclipse.gyrex.cds.service.IListingService;
 import org.eclipse.gyrex.cds.service.query.ListingQuery;
@@ -40,6 +39,8 @@ import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListF
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.ValueAscendingComparator;
 import org.eclipse.gyrex.services.common.ServiceUtil;
+
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 	private final IRuntimeContext context;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BugSearchServiceServlet.class);
+	private static final Logger QUERY_LOG = LoggerFactory.getLogger("bugsearch.querylog");
 
 	/**
 	 * Creates a new instance.
@@ -172,6 +174,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 			}
 		}
 
+		QUERY_LOG.info(listingQuery.toString());
 		final IListingResult result = service.findListings(listingQuery);
 
 		bugList.setNumFound(result.getNumFound());
