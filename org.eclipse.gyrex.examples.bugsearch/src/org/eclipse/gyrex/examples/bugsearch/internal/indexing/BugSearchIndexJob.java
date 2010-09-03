@@ -162,7 +162,7 @@ public abstract class BugSearchIndexJob extends Job {
 	protected IStatus run(final IProgressMonitor progressMonitor) {
 		final SubMonitor monitor = SubMonitor.convert(progressMonitor, "Indexing Bugzilla...", 100);
 		try {
-			LOG.info("Started indexing...");
+			LOG.info("Started Indexing Bugzilla: " + toString());
 
 			final Bundle bundle = BugSearchActivator.getInstance().getBundle();
 			if (null == bundle) {
@@ -212,6 +212,7 @@ public abstract class BugSearchIndexJob extends Job {
 			return Status.CANCEL_STATUS;
 		} finally {
 			monitor.done();
+			LOG.info("Finished Indexing Bugzilla: " + toString());
 		}
 
 		return Status.OK_STATUS;
