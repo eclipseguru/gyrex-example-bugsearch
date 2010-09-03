@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- console logging -->
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- application log file -->
+  <appender name="applog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- deny all events with a level below INFO, that is TRACE and DEBUG -->
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <file>${gyrex.instance.area.logs:-logs/}zcalc.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover -->
+      <fileNamePattern>${gyrex.instance.area.logs:-logs/}zcalc.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <!-- keep 30 days' worth of history -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- query log file -->
+  <appender name="querylog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${gyrex.instance.area.logs:-logs/}queries.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover -->
+      <fileNamePattern>${gyrex.instance.area.logs:-logs/}queries.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <!-- keep 30 days' worth of history -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- enable logging for interested packages -->
+  <logger name="org.eclipse.gyrex.examples.bugsearch" level="INFO">
+    <!-- log to console -->
+    <appender-ref ref="console" />
+  </logger>
+
+  <!-- configure query logging -->
+  <logger name="bugsearch.querylog" level="INFO" additivity="false">
+    <appender-ref ref="querylog" />
+  </logger>
+
+  <!-- configure default logging (children can override) -->
+  <root level="WARN">
+    <appender-ref ref="applog" />
+  </root>
+
+</configuration>
