@@ -27,6 +27,11 @@ import org.eclipse.gyrex.toolkit.widgets.DialogFieldRules;
 import org.eclipse.gyrex.toolkit.widgets.TextInput;
 import org.eclipse.gyrex.toolkit.wizard.WizardContainer;
 import org.eclipse.gyrex.toolkit.wizard.WizardPage;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +43,6 @@ public class BugSearchSetupStep extends ConfigurationWizardStep {
 		super("org.eclipse.gyrex.examples.bugsearch.setup");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.gyrex.admin.configuration.wizard.ConfigurationWizardStep#createPages(org.eclipse.gyrex.admin.configuration.wizard.WizardContainer)
-	 */
 	@Override
 	public void createPages(final WizardContainer wizard) {
 		final WizardPage wizardPage = new WizardPage("bugsearch-setup", wizard);
@@ -68,11 +70,8 @@ public class BugSearchSetupStep extends ConfigurationWizardStep {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.gyrex.admin.configuration.wizard.ConfigurationWizardStep#wizardFinished(org.eclipse.gyrex.admin.configuration.wizard.CommandExecutionEvent)
-	 */
 	@Override
-	public boolean wizardFinished(final CommandExecutionEvent finishEvent) {
+	public IStatus wizardFinished(final CommandExecutionEvent finishEvent, final IProgressMonitor monitor) {
 		final BooleanContent deploy = (BooleanContent) finishEvent.getContentSet().getEntry("bugsearch-deploy");
 		if ((null != deploy) && deploy.getValue()) {
 			try {
@@ -96,12 +95,11 @@ public class BugSearchSetupStep extends ConfigurationWizardStep {
 
 			} catch (final Exception e) {
 				LOG.error("Error while setting up Eclipse BugSearch: " + e, e);
-				e.printStackTrace();
-				return false;
+				return new Status(IStatus.ERROR, BugSearchActivator.PLUGIN_ID, e.getMessage());
 			}
 		}
 
-		return true;
+		return Status.OK_STATUS;
 	}
 
 }
