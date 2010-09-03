@@ -20,10 +20,15 @@ import org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchDataImpor
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  */
 public class BugzillaUpdateScheduler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(BugzillaUpdateScheduler.class);
 
 	private static BugSearchDataImport initialImport;
 	private static BugSearchDataImport update;
@@ -85,9 +90,6 @@ public class BugzillaUpdateScheduler {
 			return;
 		}
 		update = new BugSearchDataImport(context, Mode.UPDATE, interval, timeUnit) {
-			/* (non-Javadoc)
-			 * @see org.eclipse.gyrex.examples.bugsearch.internal.BugSearchDataImport#run(org.eclipse.core.runtime.IProgressMonitor)
-			 */
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				final IStatus status = super.run(monitor);
@@ -96,6 +98,7 @@ public class BugzillaUpdateScheduler {
 				return status;
 			}
 		};
-		update.schedule();
+		update.schedule(10000);
+		LOG.info("Scheduled auto-update every " + interval + " " + timeUnit.toString());
 	}
 }

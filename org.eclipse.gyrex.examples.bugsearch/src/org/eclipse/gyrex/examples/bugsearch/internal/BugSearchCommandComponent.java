@@ -15,6 +15,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.gyrex.cds.model.IListingManager;
 import org.eclipse.gyrex.cds.model.solr.internal.SolrListingsManager;
@@ -32,6 +33,7 @@ import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepositoryMetrics;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.mylyn.internal.bugzilla.core.BugzillaRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -51,12 +53,15 @@ public class BugSearchCommandComponent implements CommandProvider {
 	static final DateFormat ISO_8601_UTC = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
 
 	private IRuntimeContextRegistry contextRegistry;
+	private IJobManager jobManager;
 	private final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
 	private final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
 
-	public void _bsCancelImport(final CommandInterpreter ci) {
-		BugzillaUpdateScheduler.cancelImportJob();
-		ci.println("Canceld update job.");
+	private IRuntimeContext eclipseBugSearchContext;
+
+	public void _bsCancel(final CommandInterpreter ci) {
+		jobManager.cancel(BugSearchIndexJob.FAMILY);
+		ci.println("Canceld BugSearch jobs.");
 	}
 
 	public void _bsConcurrency(final CommandInterpreter ci) {
@@ -64,10 +69,10 @@ public class BugSearchCommandComponent implements CommandProvider {
 		final int concurrencyLevel = NumberUtils.toInt(ci.nextArgument(), 8);
 		BugSearchIndexJob.PARALLEL_THREADS = concurrencyLevel;
 		ci.println("Concurrency set to " + concurrencyLevel + " threads for next scheduled indexing job.");
+
 	}
 
 	public void _bsIndex(final CommandInterpreter ci) {
-		final IRuntimeContext eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
 		if (null == eclipseBugSearchContext) {
 			ci.println("Eclipse bug search context not found!");
 			return;
@@ -211,8 +216,13 @@ public class BugSearchCommandComponent implements CommandProvider {
 		ci.println("Rescheduled indexing.");
 	}
 
+	public void _bsScheduleAutoUpdate(final CommandInterpreter ci) {
+		BugzillaUpdateScheduler.scheduleUpdateJob(eclipseBugSearchContext, 20, TimeUnit.MINUTES);
+		ci.println("Schedule auto-update to check for update every 20 minutes.");
+	}
+
 	public void _bsStatus(final CommandInterpreter ci) {
-		final Job[] jobs = Job.getJobManager().find(BugSearchIndexJob.FAMILY);
+		final Job[] jobs = jobManager.find(BugSearchIndexJob.FAMILY);
 		if ((null == jobs) || (jobs.length == 0)) {
 			ci.println("No jobs scheduled.");
 			return;
@@ -225,12 +235,14 @@ public class BugSearchCommandComponent implements CommandProvider {
 
 	protected void activate(final ComponentContext context) {
 		contextRegistry = (IRuntimeContextRegistry) context.locateService("IRuntimeContextRegistry");
-
+		jobManager = (IJobManager) context.locateService("IJobManager");
+		eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
 	}
 
 	protected void deactivate(final ComponentContext context) {
 		// release references
 		contextRegistry = null;
+		jobManager = null;
 	}
 
 	@Override
@@ -238,13 +250,15 @@ public class BugSearchCommandComponent implements CommandProvider {
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append("---BugSearch---\n");
 		buffer.append("\tbsIndex <bug id> - indexes a specific bug\n");
-		buffer.append("\tbsOptimize - kicks off indexing optimization\n");
 		buffer.append("\tbsReindex  - kicks off re-indexing of the whole bugs index\n");
-		buffer.append("\tbsCancelImport\n");
-		buffer.append("\tbsConcurrency\n");
-		buffer.append("\tbsStatus\n");
-		buffer.append("\tbsCommit\n");
+		buffer.append("\tbsScheduleAutoUpdate - reschedules auto-indexing\n");
+		buffer.append("\tbsOptimize - kicks off indexing optimization\n");
+		buffer.append("\tbsCommit - commit Solr index\n");
+		buffer.append("\tbsCancel - cancel running jobst\n");
+		buffer.append("\tbsConcurrency - set indexing concurrency level\n");
+		buffer.append("\tbsStatus - show job status\n");
 		buffer.append("\tbsIndexChanges <hours> - indexes changes from the last X hours\n");
+		buffer.append("\tbsMetrics - print some metrics\n");
 		return buffer.toString();
 	}
 
