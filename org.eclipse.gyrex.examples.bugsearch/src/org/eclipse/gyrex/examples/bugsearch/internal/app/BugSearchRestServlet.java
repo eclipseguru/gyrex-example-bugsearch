@@ -52,6 +52,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service for delivering bugs in a rest style approach
@@ -61,6 +63,8 @@ public class BugSearchRestServlet extends HttpServlet {
 	static interface Enhancer {
 		void enhanceWithinObject(JsonGenerator json) throws IOException;
 	}
+
+	private static final Logger QUERY_LOG = LoggerFactory.getLogger("bugsearch.querylog");
 
 	private static final String[] AUTO_COMPLETE_ATTRIBUTES = StringUtils.split("id,uripath,title,reporter,keyword,product,component,score,status,resolution", ',');
 
@@ -223,6 +227,7 @@ public class BugSearchRestServlet extends HttpServlet {
 			}
 		}
 
+		QUERY_LOG.info(query.toString());
 		final IListingResult result = listingService.findListings(query);
 		if (null == result) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
