@@ -14,10 +14,10 @@
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
     </filter>
-    <file>${gyrex.instance.area.logs:-logs/}zcalc.log</file>
+    <file>${gyrex.instance.area.logs:-logs/}application.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>${gyrex.instance.area.logs:-logs/}zcalc.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>${gyrex.instance.area.logs:-logs/}application.%d{yyyy-MM-dd}.log</fileNamePattern>
       <!-- keep 30 days' worth of history -->
       <maxHistory>30</maxHistory>
     </rollingPolicy>
