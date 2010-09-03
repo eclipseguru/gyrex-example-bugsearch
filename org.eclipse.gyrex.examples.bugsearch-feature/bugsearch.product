@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="Gyrex BugSearch (Incubation)" uid="org.eclipse.gyrex.examples.products.bugsearch" application="org.eclipse.gyrex.boot.server" version="1.0" useFeatures="true" includeLaunchers="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>-console -nosplash</programArgs>
+      <vmArgs>-Dorg.eclipse.equinox.http.jetty.autostart=false</vmArgs>
+      <vmArgsLin>-XX:+UseParallelGC</vmArgsLin>
+      <vmArgsMac>-XstartOnFirstThread
+-Dorg.eclipse.swt.internal.carbon.smallFonts
+-XX:+UseParallelGC</vmArgsMac>
+      <vmArgsSol>-XX:+UseParallelGC</vmArgsSol>
+      <vmArgsWin>-XX:+UseParallelGC</vmArgsWin>
+   </launcherArgs>
+
+   <launcher name="gyrex">
+      <solaris/>
+      <win useIco="true">
+         <ico path="/org.eclipse.gyrex.examples.bugsearch/icons/favicon.ico"/>
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.eclipse.gyrex.examples.bugsearch" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.admin" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.dependencies.commons" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.dependencies.provisioning" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.dependencies.solr" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.dependencies.web" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.http" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.kernel" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.gyrex.features.server" version="1.0.0.qualifier"/>
+   </features>
+
+   <configurations>
+      <plugin id="org.eclipse.equinox.app" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="3" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.gyrex.log.http" autoStart="true" startLevel="0" />
+      <plugin id="org.slf4j.api" autoStart="true" startLevel="2" />
+   </configurations>
+
+</product>
