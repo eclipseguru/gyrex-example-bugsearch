@@ -44,7 +44,7 @@ import org.eclipse.gyrex.services.common.ServiceUtil;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.JavaTypeMapper;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -410,12 +410,12 @@ public class BugSearchRestServlet extends HttpServlet {
 		if (attributes.length > 0) {
 			json.writeFieldName("attributes");
 			json.writeStartObject();
-			final JavaTypeMapper javaTypeMapper = new JavaTypeMapper();
+			final ObjectMapper javaTypeMapper = new ObjectMapper();
 			for (final IListingAttribute attribute : attributes) {
 				json.writeFieldName(attribute.getName());
 				json.writeStartArray();
 				for (final Object object : attribute.getValues()) {
-					javaTypeMapper.writeAny(json, object);
+					javaTypeMapper.writeValue(json, object);
 				}
 				json.writeEndArray();
 			}
