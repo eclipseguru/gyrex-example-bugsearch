@@ -25,12 +25,12 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.gyrex.cds.model.IListing;
-import org.eclipse.gyrex.cds.service.IListingService;
-import org.eclipse.gyrex.cds.service.query.ListingQuery;
-import org.eclipse.gyrex.cds.service.result.IListingResult;
-import org.eclipse.gyrex.cds.service.result.IListingResultFacet;
-import org.eclipse.gyrex.cds.service.result.IListingResultFacetValue;
+import org.eclipse.gyrex.cds.IListing;
+import org.eclipse.gyrex.cds.IListingService;
+import org.eclipse.gyrex.cds.query.ListingQuery;
+import org.eclipse.gyrex.cds.result.IListingResult;
+import org.eclipse.gyrex.cds.result.IListingResultFacet;
+import org.eclipse.gyrex.cds.result.IListingResultFacetValue;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugList;

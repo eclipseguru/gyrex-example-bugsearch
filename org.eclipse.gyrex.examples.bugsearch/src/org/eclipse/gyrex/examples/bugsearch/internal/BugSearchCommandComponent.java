@@ -17,7 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.gyrex.cds.model.IListingManager;
+import org.eclipse.gyrex.cds.IListingManager;
 import org.eclipse.gyrex.cds.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;

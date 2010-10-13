@@ -11,7 +11,7 @@
  */
 package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
-import org.eclipse.gyrex.cds.model.IListingManager;
+import org.eclipse.gyrex.cds.IListingManager;
 import org.eclipse.gyrex.cds.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
 import org.eclipse.gyrex.context.IRuntimeContext;

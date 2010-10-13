@@ -25,8 +25,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.gyrex.cds.model.IListingManager;
-import org.eclipse.gyrex.cds.model.documents.Document;
+import org.eclipse.gyrex.cds.IListingManager;
+import org.eclipse.gyrex.cds.documents.Document;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 
 import org.eclipse.core.runtime.IProgressMonitor;
