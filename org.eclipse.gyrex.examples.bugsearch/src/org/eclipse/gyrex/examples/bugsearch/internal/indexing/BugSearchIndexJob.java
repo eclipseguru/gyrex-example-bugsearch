@@ -11,7 +11,7 @@
  */
 package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
-import org.eclipse.gyrex.cds.IListingManager;
+import org.eclipse.gyrex.cds.documents.IDocumentManager;
 import org.eclipse.gyrex.cds.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
 import org.eclipse.gyrex.context.IRuntimeContext;
@@ -170,8 +170,8 @@ public abstract class BugSearchIndexJob extends Job {
 				return Status.CANCEL_STATUS;
 			}
 
-			final IListingManager listingManager = ModelUtil.getManager(IListingManager.class, getContext());
-			final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) listingManager).getAdapter(SolrRepository.class);
+			final IDocumentManager documentManager = ModelUtil.getManager(IDocumentManager.class, getContext());
+			final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) documentManager).getAdapter(SolrRepository.class);
 			if (null == solrRepository) {
 				return Status.CANCEL_STATUS;
 			}
@@ -184,7 +184,7 @@ public abstract class BugSearchIndexJob extends Job {
 
 			try {
 
-				publisher = new DocumentsPublisher(repository, connector, listingManager, solrRepository);
+				publisher = new DocumentsPublisher(repository, connector, documentManager, solrRepository);
 
 				// fetch bugs and index
 				doIndex(monitor.newChild(50), repository, connector, publisher);

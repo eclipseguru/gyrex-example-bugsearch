@@ -22,11 +22,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.gyrex.cds.IListing;
-import org.eclipse.gyrex.cds.IListingAttribute;
-import org.eclipse.gyrex.cds.IListingManager;
 import org.eclipse.gyrex.cds.IListingService;
 import org.eclipse.gyrex.cds.documents.Document;
+import org.eclipse.gyrex.cds.documents.IDocument;
+import org.eclipse.gyrex.cds.documents.IDocumentAttribute;
+import org.eclipse.gyrex.cds.documents.IDocumentManager;
 import org.eclipse.gyrex.cds.model.solr.ISolrQueryExecutor;
 import org.eclipse.gyrex.cds.query.ListingQuery;
 import org.eclipse.gyrex.cds.query.ListingQuery.ResultDimension;
@@ -110,8 +110,8 @@ public class BugSearchRestServlet extends HttpServlet {
 	 */
 	private void doAutoComplete(final HttpServletRequest req, final HttpServletResponse resp, final String autocompleteTerm) throws IOException {
 		// auto completion is an advanced feature and not supported by all listing service implementations
-		final IListingManager listingManager = ModelUtil.getManager(IListingManager.class, getContext());
-		final ISolrQueryExecutor executor = (ISolrQueryExecutor) listingManager.getAdapter(ISolrQueryExecutor.class);
+		final IDocumentManager documentManager = ModelUtil.getManager(IDocumentManager.class, getContext());
+		final ISolrQueryExecutor executor = (ISolrQueryExecutor) documentManager.getAdapter(ISolrQueryExecutor.class);
 		if (null == executor) {
 			throw new ApplicationException(503, "auto completion not supported");
 		}
@@ -393,7 +393,7 @@ public class BugSearchRestServlet extends HttpServlet {
 		json.writeEndObject();
 	}
 
-	private void writeJsonBug(final IListing listing, final JsonGenerator json, final HttpServletRequest req, final Enhancer enhancer) throws IOException {
+	private void writeJsonBug(final IDocument listing, final JsonGenerator json, final HttpServletRequest req, final Enhancer enhancer) throws IOException {
 		if (null == listing) {
 			return;
 		}
@@ -406,12 +406,12 @@ public class BugSearchRestServlet extends HttpServlet {
 		writeValue("uri", getBaseUrl(req).append(listing.getUriPath()).toString(), json);
 		writeValue("uripath", listing.getUriPath(), json);
 
-		final IListingAttribute[] attributes = listing.getAttributes();
+		final IDocumentAttribute[] attributes = listing.getAttributes();
 		if (attributes.length > 0) {
 			json.writeFieldName("attributes");
 			json.writeStartObject();
 			final ObjectMapper javaTypeMapper = new ObjectMapper();
-			for (final IListingAttribute attribute : attributes) {
+			for (final IDocumentAttribute attribute : attributes) {
 				json.writeFieldName(attribute.getName());
 				json.writeStartArray();
 				for (final Object object : attribute.getValues()) {
@@ -451,7 +451,7 @@ public class BugSearchRestServlet extends HttpServlet {
 
 		json.writeFieldName("bugs");
 		json.writeStartArray();
-		for (final IListing listing : result.getListings()) {
+		for (final IDocument listing : result.getListings()) {
 			writeJsonBug(listing, json, req, null);
 		}
 		json.writeEndArray();
@@ -472,10 +472,10 @@ public class BugSearchRestServlet extends HttpServlet {
 		//writeValue("numFound", result.getNumFound(), json);
 		//writeValue("startOffset", result.getStartOffset(), json);
 
-		final IListing[] listings = result.getListings();
+		final IDocument[] listings = result.getListings();
 		if (listings.length == 1) {
 			json.writeFieldName("bug");
-			final IListing bug = listings[0];
+			final IDocument bug = listings[0];
 			writeJsonBug(bug, json, req, null);
 		}
 

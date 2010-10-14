@@ -25,8 +25,8 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.gyrex.cds.IListing;
 import org.eclipse.gyrex.cds.IListingService;
+import org.eclipse.gyrex.cds.documents.IDocument;
 import org.eclipse.gyrex.cds.query.ListingQuery;
 import org.eclipse.gyrex.cds.result.IListingResult;
 import org.eclipse.gyrex.cds.result.IListingResultFacet;
@@ -205,7 +205,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 			bugList.addFilter(filter);
 		}
 
-		for (final IListing listing : result.getListings()) {
+		for (final IDocument listing : result.getListings()) {
 			final int bugNum = NumberUtils.toInt(listing.getId(), 0);
 			if (bugNum <= 0) {
 				continue;

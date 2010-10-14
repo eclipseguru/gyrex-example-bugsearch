@@ -17,7 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.gyrex.cds.IListingManager;
+import org.eclipse.gyrex.cds.documents.IDocumentManager;
 import org.eclipse.gyrex.cds.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
@@ -132,8 +132,8 @@ public class BugSearchCommandComponent implements CommandProvider {
 			return;
 		}
 
-		final IListingManager listingManager = ModelUtil.getManager(IListingManager.class, eclipseBugSearchContext);
-		final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) listingManager).getAdapter(SolrRepository.class);
+		final IDocumentManager documentManager = ModelUtil.getManager(IDocumentManager.class, eclipseBugSearchContext);
+		final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) documentManager).getAdapter(SolrRepository.class);
 		if (null == solrRepository) {
 			ci.println("Bug search Solr repository not found!");
 			return;

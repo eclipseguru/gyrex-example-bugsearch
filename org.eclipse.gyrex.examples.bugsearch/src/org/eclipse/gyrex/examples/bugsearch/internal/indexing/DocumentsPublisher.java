@@ -25,8 +25,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.gyrex.cds.IListingManager;
 import org.eclipse.gyrex.cds.documents.Document;
+import org.eclipse.gyrex.cds.documents.IDocumentManager;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -91,9 +91,9 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	 * @param documents
 	 * @param bugsCount
 	 * @param batchSize
-	 * @param listingManager
+	 * @param documentManager
 	 */
-	DocumentsPublisher(final TaskRepository taskRepository, final BugzillaRepositoryConnector connector, final IListingManager listingManager, final SolrRepository repository) {
+	DocumentsPublisher(final TaskRepository taskRepository, final BugzillaRepositoryConnector connector, final IDocumentManager documentManager, final SolrRepository repository) {
 		this.taskRepository = taskRepository;
 		this.connector = connector;
 		this.repository = repository;
