@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.gyrex.cds.IListingService;
-import org.eclipse.gyrex.cds.documents.Document;
 import org.eclipse.gyrex.cds.documents.IDocument;
 import org.eclipse.gyrex.cds.documents.IDocumentAttribute;
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
@@ -160,14 +159,14 @@ public class BugSearchRestServlet extends HttpServlet {
 		if ((null != path) && (path.length() > 1)) {
 			if (path.startsWith(ID_PATH_PREFIX)) {
 				// ID path
-				query.setFilterQueries(Document.ID + ":" + path.substring(ID_PATH_PREFIX.length()));
+				query.setFilterQueries(IDocument.ATTRIBUTE_ID + ":" + path.substring(ID_PATH_PREFIX.length()));
 			} else if (path.startsWith(AUTOCOMPLETE_PATH_PREFIX)) {
 				// auto complete
 				doAutoComplete(req, resp, path.substring(AUTOCOMPLETE_PATH_PREFIX.length()));
 				return;
 			} else {
 				// URI path
-				query.setFilterQueries(Document.URI_PATH + ":" + path.substring(1));
+				query.setFilterQueries(IDocument.ATTRIBUTE_URI_PATH + ":" + path.substring(1));
 			}
 			query.setResultDimension(ResultDimension.FULL);
 			query.setMaxResults(1);
@@ -406,13 +405,13 @@ public class BugSearchRestServlet extends HttpServlet {
 		writeValue("uri", getBaseUrl(req).append(listing.getUriPath()).toString(), json);
 		writeValue("uripath", listing.getUriPath(), json);
 
-		final IDocumentAttribute[] attributes = listing.getAttributes();
-		if (attributes.length > 0) {
+		final Map<String, IDocumentAttribute> attributes = listing.getAttributes();
+		if (!attributes.isEmpty()) {
 			json.writeFieldName("attributes");
 			json.writeStartObject();
 			final ObjectMapper javaTypeMapper = new ObjectMapper();
-			for (final IDocumentAttribute attribute : attributes) {
-				json.writeFieldName(attribute.getName());
+			for (final IDocumentAttribute attribute : attributes.values()) {
+				json.writeFieldName(attribute.getId());
 				json.writeStartArray();
 				for (final Object object : attribute.getValues()) {
 					javaTypeMapper.writeValue(json, object);

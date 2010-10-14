@@ -212,8 +212,8 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 			}
 			final Bug bug = new Bug(bugNum);
 			bug.setSummary(listing.getTitle());
-			bug.setProduct((String) listing.getAttribute("product").getValues()[0]);
-			bug.setScore(((Float) listing.getAttribute("score").getValues()[0]).floatValue());
+			bug.setProduct((String) listing.get("product").getValues().iterator().next());
+			bug.setScore(((Float) listing.get("score").getValues().iterator().next()).floatValue());
 			bugList.addBug(bug);
 		}
 

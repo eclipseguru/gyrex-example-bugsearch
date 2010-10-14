@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.gyrex.cds.documents.Document;
+import org.eclipse.gyrex.cds.documents.IDocument;
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 
@@ -184,11 +184,11 @@ public final class DocumentsPublisher extends TaskDataCollector {
 
 			final SolrInputDocument document = new SolrInputDocument();
 
-			setField(document, Document.ID, taskData.getTaskId());
-			setField(document, Document.NAME, taskData.getTaskId());
-			setField(document, Document.URI_PATH, taskData.getTaskId());
-			setField(document, Document.TITLE, taskMapping.getSummary());
-			setField(document, Document.DESCRIPTION, taskMapping.getDescription());
+			setField(document, IDocument.ATTRIBUTE_ID, taskData.getTaskId());
+			setField(document, IDocument.ATTRIBUTE_NAME, taskData.getTaskId());
+			setField(document, IDocument.ATTRIBUTE_URI_PATH, taskData.getTaskId());
+			setField(document, IDocument.ATTRIBUTE_TITLE, taskMapping.getSummary());
+			setField(document, IDocument.ATTRIBUTE_DESCRIPTION, taskMapping.getDescription());
 
 			// comments
 			final List<TaskAttribute> taskComments = taskData.getAttributeMapper().getAttributesByType(taskData, TaskAttribute.TYPE_COMMENT);
