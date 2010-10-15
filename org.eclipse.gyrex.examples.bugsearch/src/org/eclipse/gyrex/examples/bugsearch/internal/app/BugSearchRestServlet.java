@@ -13,26 +13,29 @@ package org.eclipse.gyrex.examples.bugsearch.internal.app;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.gyrex.cds.IListingService;
+import org.eclipse.gyrex.cds.IContentDeliveryService;
 import org.eclipse.gyrex.cds.documents.IDocument;
 import org.eclipse.gyrex.cds.documents.IDocumentAttribute;
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
 import org.eclipse.gyrex.cds.model.solr.ISolrQueryExecutor;
-import org.eclipse.gyrex.cds.query.ListingQuery;
-import org.eclipse.gyrex.cds.query.ListingQuery.ResultDimension;
-import org.eclipse.gyrex.cds.query.ListingQuery.SortDirection;
-import org.eclipse.gyrex.cds.result.IListingResult;
-import org.eclipse.gyrex.cds.result.IListingResultFacet;
-import org.eclipse.gyrex.cds.result.IListingResultFacetValue;
+import org.eclipse.gyrex.cds.query.IQuery;
+import org.eclipse.gyrex.cds.query.QueryUtil;
+import org.eclipse.gyrex.cds.query.ResultProjection;
+import org.eclipse.gyrex.cds.query.SortDirection;
+import org.eclipse.gyrex.cds.result.IResult;
+import org.eclipse.gyrex.cds.result.IResultFacet;
+import org.eclipse.gyrex.cds.result.IResultFacetValue;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
@@ -151,24 +154,24 @@ public class BugSearchRestServlet extends HttpServlet {
 		// enable some basic caching (5min)
 		resp.setHeader("Cache-Control", "max-age=300, public");
 
-		final IListingService listingService = ServiceUtil.getService(IListingService.class, getContext());
-		final ListingQuery query = new ListingQuery();
+		final IContentDeliveryService cds = ServiceUtil.getService(IContentDeliveryService.class, getContext());
+		final IQuery query = cds.createQuery();
 		boolean isSingle = false;
 
 		final String path = req.getPathInfo();
 		if ((null != path) && (path.length() > 1)) {
 			if (path.startsWith(ID_PATH_PREFIX)) {
 				// ID path
-				query.setFilterQueries(IDocument.ATTRIBUTE_ID + ":" + path.substring(ID_PATH_PREFIX.length()));
+				query.addAttributeFilter(IDocument.ATTRIBUTE_ID).matchValue(QueryUtil.escapeQueryChars(path.substring(ID_PATH_PREFIX.length())));
 			} else if (path.startsWith(AUTOCOMPLETE_PATH_PREFIX)) {
 				// auto complete
 				doAutoComplete(req, resp, path.substring(AUTOCOMPLETE_PATH_PREFIX.length()));
 				return;
 			} else {
 				// URI path
-				query.setFilterQueries(IDocument.ATTRIBUTE_URI_PATH + ":" + path.substring(1));
+				query.addAttributeFilter(IDocument.ATTRIBUTE_URI_PATH).matchValue(QueryUtil.escapeQueryChars(path.substring(1)));
 			}
-			query.setResultDimension(ResultDimension.FULL);
+			query.setResultProjection(ResultProjection.FULL);
 			query.setMaxResults(1);
 			isSingle = true;
 		} else {
@@ -195,7 +198,7 @@ public class BugSearchRestServlet extends HttpServlet {
 				if ((null != facetValues) && (facetValues.length > 0)) {
 					for (final String facetValue : facetValues) {
 						if (StringUtils.isNotBlank(facetValue)) {
-							query.addFilterQuery('+' + getFacetField(activeFacetName) + ':' + ListingQuery.escapeQueryChars(facetValue));
+							query.addFilterQuery('+' + getFacetField(activeFacetName) + ':' + QueryUtil.escapeQueryChars(facetValue));
 						}
 					}
 				}
@@ -227,7 +230,16 @@ public class BugSearchRestServlet extends HttpServlet {
 		}
 
 		QUERY_LOG.info(query.toString());
-		final IListingResult result = listingService.findListings(query);
+		IResult result;
+		try {
+			result = cds.findByQuery(query).get();
+		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+			resp.sendError(503);
+			return;
+		} catch (final ExecutionException e) {
+			throw new ApplicationException(e.getCause());
+		}
 		if (null == result) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -322,19 +334,19 @@ public class BugSearchRestServlet extends HttpServlet {
 		return null;
 	}
 
-	private void writeFacet(final IListingResultFacet facet, final JsonGenerator json) throws IOException {
+	private void writeFacet(final IResultFacet facet, final JsonGenerator json) throws IOException {
 		if (null == facet) {
 			return;
 		}
 		json.writeStartObject();
 
 		json.writeFieldName("label");
-		json.writeString(facet.getLabel());
+		json.writeString(facet.getFacet().getName());
 
 		json.writeFieldName("values");
 		json.writeStartArray();
-		final IListingResultFacetValue[] values = facet.getValues();
-		for (final IListingResultFacetValue value : values) {
+		final Collection<IResultFacetValue> values = facet.getValues().values();
+		for (final IResultFacetValue value : values) {
 			json.writeStartObject();
 			writeValue("value", value.getValue(), json);
 			writeValue("count", value.getCount(), json);
@@ -346,7 +358,7 @@ public class BugSearchRestServlet extends HttpServlet {
 		json.writeEndObject();
 	}
 
-	private void writeJson(final HttpServletRequest req, final HttpServletResponse resp, final boolean isSingle, final IListingResult result) throws IOException {
+	private void writeJson(final HttpServletRequest req, final HttpServletResponse resp, final boolean isSingle, final IResult result) throws IOException {
 		if (req.getParameter("text") != null) {
 			resp.setContentType("text/plain");
 		} else {
@@ -428,7 +440,7 @@ public class BugSearchRestServlet extends HttpServlet {
 		json.writeEndObject();
 	}
 
-	private void writeJsonBugResult(final IListingResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
+	private void writeJsonBugResult(final IResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
 		json.writeStartObject();
 
 		writeValue("version", "1.0", json);
@@ -443,7 +455,7 @@ public class BugSearchRestServlet extends HttpServlet {
 
 		json.writeFieldName("facets");
 		json.writeStartArray();
-		for (final IListingResultFacet facet : result.getFacets()) {
+		for (final IResultFacet facet : result.getFacets().values()) {
 			writeFacet(facet, json);
 		}
 		json.writeEndArray();
@@ -458,7 +470,7 @@ public class BugSearchRestServlet extends HttpServlet {
 		json.writeEndObject();
 	}
 
-	private void writeJsonSingleBugResult(final IListingResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
+	private void writeJsonSingleBugResult(final IResult result, final JsonGenerator json, final HttpServletRequest req) throws IOException {
 		json.writeStartObject();
 
 		writeValue("version", "1.0", json);
@@ -481,7 +493,7 @@ public class BugSearchRestServlet extends HttpServlet {
 		json.writeEndObject();
 	}
 
-	private void writeQuery(final ListingQuery query, final JsonGenerator json) throws IOException {
+	private void writeQuery(final IQuery query, final JsonGenerator json) throws IOException {
 		if (null == query) {
 			return;
 		}
@@ -523,7 +535,7 @@ public class BugSearchRestServlet extends HttpServlet {
 		}
 
 		json.writeFieldName("dimension");
-		switch (query.getResultDimension()) {
+		switch (query.getResultProjection()) {
 			case FULL:
 				json.writeString("full");
 				break;

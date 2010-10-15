@@ -22,15 +22,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.gyrex.cds.IListingService;
+import org.eclipse.gyrex.cds.IContentDeliveryService;
 import org.eclipse.gyrex.cds.documents.IDocument;
-import org.eclipse.gyrex.cds.query.ListingQuery;
-import org.eclipse.gyrex.cds.result.IListingResult;
-import org.eclipse.gyrex.cds.result.IListingResultFacet;
-import org.eclipse.gyrex.cds.result.IListingResultFacetValue;
+import org.eclipse.gyrex.cds.query.IQuery;
+import org.eclipse.gyrex.cds.query.QueryUtil;
+import org.eclipse.gyrex.cds.result.IResult;
+import org.eclipse.gyrex.cds.result.IResultFacet;
+import org.eclipse.gyrex.cds.result.IResultFacetValue;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.Bug;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugList;
@@ -38,6 +40,7 @@ import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListF
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.ValueAscendingComparator;
+import org.eclipse.gyrex.http.application.ApplicationException;
 import org.eclipse.gyrex.services.common.ServiceUtil;
 
 import org.apache.commons.lang.math.NumberUtils;
@@ -139,18 +142,18 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 	}
 
 	@Override
-	public BugList findBugs(final String query, final Map<String, List<String>> filters) {
-		final IListingService service = ServiceUtil.getService(IListingService.class, context);
+	public BugList findBugs(final String queryStr, final Map<String, List<String>> filters) {
+		final IContentDeliveryService cds = ServiceUtil.getService(IContentDeliveryService.class, context);
 
 		// the result
 		final BugList bugList = new BugList();
 
 		// the query
-		final ListingQuery listingQuery = new ListingQuery();
+		final IQuery query = cds.createQuery();
 		if (null != query) {
-			listingQuery.setQuery(query);
+			query.setQuery(queryStr);
 		}
-		listingQuery.setMaxResults(20);
+		query.setMaxResults(20);
 
 		// filters
 		if ((null != filters) && !filters.isEmpty()) {
@@ -158,7 +161,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 			final StringBuilder filterQuery = new StringBuilder(60);
 			for (final Entry<String, List<String>> filter : filters.entrySet()) {
 				filterQuery.setLength(0);
-				filterQuery.append(ListingQuery.escapeQueryChars(filter.getKey()));
+				filterQuery.append(QueryUtil.escapeQueryChars(filter.getKey()));
 				filterQuery.append(":(");
 				final List<String> values = filter.getValue();
 				int i = 0;
@@ -166,29 +169,37 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 					if (i > 0) {
 						filterQuery.append(' ');
 					}
-					filterQuery.append(ListingQuery.escapeQueryChars(value));
+					filterQuery.append(QueryUtil.escapeQueryChars(value));
 					i++;
 				}
 				filterQuery.append(')');
-				listingQuery.addFilterQuery(filterQuery.toString());
+				query.addFilterQuery(filterQuery.toString());
 			}
 		}
 
-		QUERY_LOG.info(listingQuery.toString());
-		final IListingResult result = service.findListings(listingQuery);
+		QUERY_LOG.info(query.toString());
+		final IResult result;
+		try {
+			result = cds.findByQuery(query).get();
+		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new ApplicationException(503, "search down");
+		} catch (final ExecutionException e) {
+			throw new ApplicationException(e.getCause());
+		}
 
 		bugList.setNumFound(result.getNumFound());
 		bugList.setQueryTime(result.getQueryTime());
 
-		for (final IListingResultFacet facet : result.getFacets()) {
-			final String id = facet.getId();
+		for (final IResultFacet facet : result.getFacets().values()) {
+			final String id = facet.getFacet().getAttributeId();
 			// ignore some filters
 			if (id.equals("cc") || id.equals("statusWhiteboard")) {
 				continue;
 			}
-			final BugListFilter filter = new BugListFilter(id, facet.getLabel());
+			final BugListFilter filter = new BugListFilter(id, facet.getFacet().getName());
 			final SortedSet<BugListFilterValue> values = new TreeSet<BugListFilterValue>(ValueAscendingComparator.INSTANCE);
-			for (final IListingResultFacetValue facetValue : facet.getValues()) {
+			for (final IResultFacetValue facetValue : facet.getValues().values()) {
 				// ignore empty string
 				final String value = facetValue.getValue();
 				if (value.trim().length() == 0) {
