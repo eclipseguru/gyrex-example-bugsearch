@@ -14,22 +14,29 @@ package org.eclipse.gyrex.examples.bugsearch.internal;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.gyrex.cds.facets.IFacet;
+import org.eclipse.gyrex.cds.facets.IFacetManager;
+import org.eclipse.gyrex.cds.query.FacetSelectionStrategy;
+import org.eclipse.gyrex.context.IRuntimeContext;
+import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
+import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
+import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
+import org.eclipse.gyrex.http.application.manager.IApplicationManager;
+import org.eclipse.gyrex.model.common.ModelException;
+import org.eclipse.gyrex.model.common.ModelUtil;
+import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
+import org.eclipse.gyrex.preferences.PlatformScope;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+
+import org.osgi.service.component.ComponentContext;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.gyrex.context.IRuntimeContext;
-import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
-import org.eclipse.gyrex.context.preferences.PreferencesUtil;
-import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
-import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationProvider;
-import org.eclipse.gyrex.http.application.manager.IApplicationManager;
-import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
-import org.eclipse.gyrex.preferences.PlatformScope;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +68,7 @@ public class BugSearchRuntimeSetupComponent {
 		}
 
 		// lookup the configured URL
-		final IRuntimeContextPreferences preferences = PreferencesUtil.getPreferences(eclipseBugSearchContext);
+		final IRuntimeContextPreferences preferences = eclipseBugSearchContext.getPreferences();
 		url = preferences.get(BugSearchActivator.PLUGIN_ID, IEclipseBugSearchConstants.KEY_URL, null);
 		if (null == url) {
 			LOG.debug("No URL configured for BugSearch, not registering the application");
@@ -97,30 +104,26 @@ public class BugSearchRuntimeSetupComponent {
 		}
 
 		// configure the facets
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/classification", "Classification,field,classification_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/product", "Product,field,product_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/component", "Component,field,component_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/keywords", "Keywords,field,keywords_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/tags", "Tags,field,tags_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/status", "Status,field,status_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/resolution", "Resolution,field,resolution_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/targetMilestone", "Milestone,field,targetMilestone_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/version", "Version,field,version_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/statusWhiteboard", "Whiteboard,field,statusWhiteboard_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/priority", "Priority,field,priority_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/severity", "Severity,field,severity_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/hardware", "Hardware,field,hardware_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/os", "OS,field,os_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/assignee", "Assignee,field,assignee_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/reporter", "Reporter,field,reporter_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/cc", "CC,field,cc_facet", false);
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/commenter", "Commenter,field,commenter_facet", false);
-		//		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/", ",field,_facet", false);
-		//		preferences.put("org.eclipse.gyrex.cds.service.solr", "facets/", ",field,_facet", false);
-
-		preferences.put("org.eclipse.gyrex.cds.service.solr", "activeFacets", "tags,keywords,classification,product,component,status,resolution,targetMilestone,version,statusWhiteboard,priority,severity,hardware,os,assignee,reporter,cc,commenter", false);
 		try {
-			preferences.flush("org.eclipse.gyrex.cds.service.solr");
+			final IFacetManager facetManager = ModelUtil.getManager(IFacetManager.class, eclipseBugSearchContext);
+			createFacet(facetManager, "tags", "Tags", true);
+			createFacet(facetManager, "keywords", "Keywords", true);
+			createFacet(facetManager, "classification", "Classification", true);
+			createFacet(facetManager, "product", "Product", true);
+			createFacet(facetManager, "component", "Component", true);
+			createFacet(facetManager, "status", "Status", true);
+			createFacet(facetManager, "resolution", "Resolution", true);
+			createFacet(facetManager, "targetMilestone", "Milestone", true);
+			createFacet(facetManager, "version", "Version", true);
+			createFacet(facetManager, "statusWhiteboard", "Whiteboard", true);
+			createFacet(facetManager, "priority", "Priority", true);
+			createFacet(facetManager, "severity", "Severity", true);
+			createFacet(facetManager, "hardware", "Hardware", true);
+			createFacet(facetManager, "os", "OS", true);
+			createFacet(facetManager, "assignee", "Assignee", true);
+			createFacet(facetManager, "reporter", "Reporter", true);
+			createFacet(facetManager, "cc", "CC", true);
+			createFacet(facetManager, "commenter", "Commenter", true);
 		} catch (final Exception e) {
 			LOG.error("Error while flushing preferences after configuring the facets: " + e, e);
 			return;
@@ -148,6 +151,14 @@ public class BugSearchRuntimeSetupComponent {
 
 		// schedule initial indexing followed by updates every 20 minutes
 		BugzillaUpdateScheduler.scheduleInitialImportFollowedByUpdate(eclipseBugSearchContext, 20, TimeUnit.MINUTES);
+	}
+
+	private void createFacet(final IFacetManager facetManager, final String attributeId, final String name, final boolean enabled) throws ModelException {
+		final IFacet facet = facetManager.create(attributeId);
+		facet.setName(name);
+		facet.setSelectionStrategy(FacetSelectionStrategy.MULTI);
+		facet.setEnabled(enabled);
+		facetManager.save(facet);
 	}
 
 	protected void deactivate(final ComponentContext context) {

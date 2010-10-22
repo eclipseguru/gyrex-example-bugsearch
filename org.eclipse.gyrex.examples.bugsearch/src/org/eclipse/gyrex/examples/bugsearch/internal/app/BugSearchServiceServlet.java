@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,7 +39,6 @@ import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListF
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugListFilterValue;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.ValueAscendingComparator;
-import org.eclipse.gyrex.http.application.ApplicationException;
 import org.eclipse.gyrex.services.common.ServiceUtil;
 
 import org.apache.commons.lang.math.NumberUtils;
@@ -178,15 +176,7 @@ public class BugSearchServiceServlet extends RemoteServiceServlet implements Bug
 		}
 
 		QUERY_LOG.info(query.toString());
-		final IResult result;
-		try {
-			result = cds.findByQuery(query).get();
-		} catch (final InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new ApplicationException(503, "search down");
-		} catch (final ExecutionException e) {
-			throw new ApplicationException(e.getCause());
-		}
+		final IResult result = cds.findByQuery(query);
 
 		bugList.setNumFound(result.getNumFound());
 		bugList.setQueryTime(result.getQueryTime());

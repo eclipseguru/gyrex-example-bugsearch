@@ -12,14 +12,13 @@
 package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
-import org.eclipse.gyrex.cds.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.configuration.PlatformConfiguration;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.model.common.ModelUtil;
-import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
+import org.eclipse.gyrex.persistence.solr.SolrServerRepository;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -137,7 +136,11 @@ public abstract class BugSearchIndexJob extends Job {
 			processed = publisher.getBugsCount() - oldBugsCount;
 			start += processed;
 			oldBugsCount = publisher.getBugsCount();
-			publisher.commit();
+			try {
+				publisher.commit();
+			} catch (final Exception e) {
+				LOG.error("Error while committing Solr index for context " + getContext(), e);
+			}
 		} while ((processed > 0));//&& (oldBugsCount < 100000));
 
 		preferences.putInt(BugSearchActivator.PLUGIN_ID, "import.start", start - 1, false);
@@ -171,7 +174,7 @@ public abstract class BugSearchIndexJob extends Job {
 			}
 
 			final IDocumentManager documentManager = ModelUtil.getManager(IDocumentManager.class, getContext());
-			final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) documentManager).getAdapter(SolrRepository.class);
+			final SolrServerRepository solrRepository = (SolrServerRepository) documentManager.getAdapter(SolrServerRepository.class);
 			if (null == solrRepository) {
 				return Status.CANCEL_STATUS;
 			}
@@ -195,7 +198,7 @@ public abstract class BugSearchIndexJob extends Job {
 				LOG.debug("Published " + publisher.getBugsCount() + " bugs.");
 
 				// commit
-				solrRepository.commit(true, false);
+				solrRepository.getSolrServer().commit(true, false);
 				monitor.worked(10);
 			} finally {
 				//CommonsNetPlugin.getExecutorService().shutdown();

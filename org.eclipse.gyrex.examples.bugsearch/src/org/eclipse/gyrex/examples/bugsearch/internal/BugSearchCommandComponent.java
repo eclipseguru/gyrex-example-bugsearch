@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
-import org.eclipse.gyrex.cds.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
@@ -29,6 +28,7 @@ import org.eclipse.gyrex.examples.bugsearch.internal.indexing.DocumentsPublisher
 import org.eclipse.gyrex.examples.bugsearch.internal.indexing.OptimizeIndexJob;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.monitoring.metrics.ErrorMetric.ErrorStats;
+import org.eclipse.gyrex.persistence.solr.SolrServerRepository;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
 import org.eclipse.gyrex.persistence.solr.internal.SolrRepositoryMetrics;
 
@@ -133,13 +133,13 @@ public class BugSearchCommandComponent implements CommandProvider {
 		}
 
 		final IDocumentManager documentManager = ModelUtil.getManager(IDocumentManager.class, eclipseBugSearchContext);
-		final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) documentManager).getAdapter(SolrRepository.class);
+		final SolrServerRepository solrRepository = (SolrServerRepository) documentManager.getAdapter(SolrServerRepository.class);
 		if (null == solrRepository) {
 			ci.println("Bug search Solr repository not found!");
 			return;
 		}
 
-		final SolrRepositoryMetrics metrics = solrRepository.getSolrRepositoryMetrics();
+		final SolrRepositoryMetrics metrics = ((SolrRepository) solrRepository).getSolrRepositoryMetrics();
 
 		final String nextArgument = ci.nextArgument();
 		if ("reset".equals(nextArgument)) {

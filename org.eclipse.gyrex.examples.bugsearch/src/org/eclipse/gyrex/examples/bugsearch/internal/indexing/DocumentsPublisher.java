@@ -11,6 +11,7 @@
  */
 package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.gyrex.cds.documents.IDocument;
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
-import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
+import org.eclipse.gyrex.persistence.solr.SolrServerRepository;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -41,6 +42,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +76,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 
 	/** connector */
 	private final BugzillaRepositoryConnector connector;
-	private final SolrRepository repository;
+	private final SolrServerRepository repository;
 
 	/** bugsCount */
 	private final AtomicInteger bugsCount;
@@ -93,7 +95,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 	 * @param batchSize
 	 * @param documentManager
 	 */
-	DocumentsPublisher(final TaskRepository taskRepository, final BugzillaRepositoryConnector connector, final IDocumentManager documentManager, final SolrRepository repository) {
+	DocumentsPublisher(final TaskRepository taskRepository, final BugzillaRepositoryConnector connector, final IDocumentManager documentManager, final SolrServerRepository repository) {
 		this.taskRepository = taskRepository;
 		this.connector = connector;
 		this.repository = repository;
@@ -123,11 +125,11 @@ public final class DocumentsPublisher extends TaskDataCollector {
 		}
 	}
 
-	public void commit() {
+	public void commit() throws IllegalStateException, SolrServerException, IOException {
 		if (isCanceled()) {
 			return;
 		}
-		repository.commit(false, false);
+		repository.getSolrServer().commit(false, false);
 	}
 
 	private Collection<String> extractKeywords(final ITaskMapping taskMapping) {
@@ -241,7 +243,7 @@ public final class DocumentsPublisher extends TaskDataCollector {
 				return;
 			}
 			activeTasks.put(taskId, "Adding to index...");
-			repository.add(document);
+			repository.getSolrServer().add(document);
 
 		} catch (final Exception e) {
 			LOG.warn("error while fetching bug data: " + e.getMessage());

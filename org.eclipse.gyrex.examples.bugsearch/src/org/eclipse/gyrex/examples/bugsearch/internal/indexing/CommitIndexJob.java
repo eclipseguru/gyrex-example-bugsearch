@@ -12,11 +12,10 @@
 package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
-import org.eclipse.gyrex.cds.solr.internal.SolrListingsManager;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.model.common.ModelUtil;
-import org.eclipse.gyrex.persistence.solr.internal.SolrRepository;
+import org.eclipse.gyrex.persistence.solr.SolrServerRepository;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -65,7 +64,7 @@ public class CommitIndexJob extends BugSearchIndexJob {
 			}
 
 			final IDocumentManager documentManager = ModelUtil.getManager(IDocumentManager.class, getContext());
-			final SolrRepository solrRepository = (SolrRepository) ((SolrListingsManager) documentManager).getAdapter(SolrRepository.class);
+			final SolrServerRepository solrRepository = (SolrServerRepository) documentManager.getAdapter(SolrServerRepository.class);
 			if (null == solrRepository) {
 				return Status.CANCEL_STATUS;
 			}
@@ -73,7 +72,7 @@ public class CommitIndexJob extends BugSearchIndexJob {
 			LOG.debug("Begin commit.");
 
 			// optimize
-			solrRepository.commit(true, true);
+			solrRepository.getSolrServer().commit(true, true);
 
 			LOG.debug("Commit finished.");
 
