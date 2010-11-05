@@ -12,13 +12,13 @@
 package org.eclipse.gyrex.examples.bugsearch.internal.indexing;
 
 import org.eclipse.gyrex.cds.documents.IDocumentManager;
-import org.eclipse.gyrex.configuration.PlatformConfiguration;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
 import org.eclipse.gyrex.model.common.ModelUtil;
 import org.eclipse.gyrex.persistence.solr.SolrServerRepository;
+import org.eclipse.gyrex.server.Platform;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -119,7 +119,7 @@ public abstract class BugSearchIndexJob extends Job {
 
 	protected void queryForAllBugs(final IProgressMonitor monitor, final TaskRepository repository, final BugzillaRepositoryConnector connector, final DocumentsPublisher publisher) {
 		// for demo purposes we'll fetch only a few bugs in dev mode
-		if (PlatformConfiguration.isOperatingInDevelopmentMode()) {
+		if (Platform.inDevelopmentMode()) {
 			LOG.debug("Operating in development mode, only fetching a small number of bugs");
 			final String url = URL + "buglist.cgi?field0-0-0=bug_id&type0-0-0=lessthan&value0-0-0=100&field0-1-0=bug_id&type0-1-0=greaterthan&value0-1-0=0&order=Bug+Number";
 			queryByUrl(monitor, repository, connector, publisher, url);
