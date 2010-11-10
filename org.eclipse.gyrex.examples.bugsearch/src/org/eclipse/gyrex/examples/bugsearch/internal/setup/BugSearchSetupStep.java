@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.eclipse.gyrex.examples.bugsearch.internal.setup;
 
-import org.eclipse.gyrex.admin.configuration.wizard.ConfigurationWizardStep;
+import org.eclipse.gyrex.admin.setupwizard.SetupWizardStep;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.preferences.PreferencesUtil;
@@ -35,7 +35,7 @@ import org.eclipse.core.runtime.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BugSearchSetupStep extends ConfigurationWizardStep {
+public class BugSearchSetupStep extends SetupWizardStep {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BugSearchSetupStep.class);
 

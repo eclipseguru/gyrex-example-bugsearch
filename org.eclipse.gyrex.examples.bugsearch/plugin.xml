@@ -32,7 +32,7 @@
       </role>
    </extension>
    <extension
-         point="org.eclipse.gyrex.admin.configuration.wizard">
+         point="org.eclipse.gyrex.admin.setupwizard">
       <step
             class="org.eclipse.gyrex.examples.bugsearch.internal.setup.BugSearchSetupStep"
             id="org.eclipse.gyrex.examples.bugsearch.setup">
