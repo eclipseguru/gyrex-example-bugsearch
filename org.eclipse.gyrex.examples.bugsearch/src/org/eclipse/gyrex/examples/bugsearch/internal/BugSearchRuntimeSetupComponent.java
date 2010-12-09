@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.gyrex.cds.facets.IFacet;
 import org.eclipse.gyrex.cds.facets.IFacetManager;
 import org.eclipse.gyrex.cds.query.FacetSelectionStrategy;
+import org.eclipse.gyrex.cds.solr.ISolrCdsConstants;
 import org.eclipse.gyrex.context.IRuntimeContext;
 import org.eclipse.gyrex.context.preferences.IRuntimeContextPreferences;
 import org.eclipse.gyrex.context.registry.IRuntimeContextRegistry;
@@ -24,7 +25,11 @@ import org.eclipse.gyrex.examples.bugsearch.internal.app.BugSearchApplicationPro
 import org.eclipse.gyrex.http.application.manager.IApplicationManager;
 import org.eclipse.gyrex.model.common.ModelException;
 import org.eclipse.gyrex.model.common.ModelUtil;
+import org.eclipse.gyrex.persistence.context.preferences.IContextPreferencesRepositoryConstants;
+import org.eclipse.gyrex.persistence.internal.storage.DefaultRepositoryLookupStrategy;
 import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
+import org.eclipse.gyrex.persistence.storage.registry.IRepositoryRegistry;
+import org.eclipse.gyrex.persistence.storage.settings.IRepositoryPreferences;
 import org.eclipse.gyrex.preferences.PlatformScope;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -54,17 +59,28 @@ public class BugSearchRuntimeSetupComponent {
 	private IRuntimeContextRegistry contextRegistry;
 	private String url;
 	private IRuntimeContext eclipseBugSearchContext;
+	private IRepositoryRegistry repositoryRegistry;
 
+	@SuppressWarnings("restriction")
 	protected void activate(final ComponentContext context) {
 		LOG.trace("BugSearchRuntimeSetupComponent activation triggered");
 
 		contextRegistry = (IRuntimeContextRegistry) context.locateService("IRuntimeContextRegistry");
 		applicationManager = (IApplicationManager) context.locateService("IApplicationManager");
+		repositoryRegistry = (IRepositoryRegistry) context.locateService("IRepositoryRegistry");
 
 		eclipseBugSearchContext = contextRegistry.get(IEclipseBugSearchConstants.CONTEXT_PATH);
 		if (null == eclipseBugSearchContext) {
 			LOG.error("Eclipse bug search context not found!");
 			return;
+		}
+
+		// FIXME: use a different technique, ZooKeeper might not be available at this point
+		try {
+			Thread.sleep(5000);
+		} catch (final InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 
 		// lookup the configured URL
@@ -105,6 +121,16 @@ public class BugSearchRuntimeSetupComponent {
 
 		// configure the facets
 		try {
+			// create facets repo
+			final String repositoryId = "eclipsebugsearch.facets";
+			if (null == repositoryRegistry.getRepositoryPreferences(repositoryId)) {
+				final IRepositoryPreferences repository = repositoryRegistry.createRepository(repositoryId, IContextPreferencesRepositoryConstants.PROVIDER_ID);
+				final IEclipsePreferences prefs = repository.getPreferences();
+				prefs.put(IContextPreferencesRepositoryConstants.PREF_KEY_CONTEXT_PATH, eclipseBugSearchContext.getContextPath().toString());
+				prefs.flush();
+				DefaultRepositoryLookupStrategy.setRepository(eclipseBugSearchContext, ISolrCdsConstants.FACET_CONTENT_TYPE, repositoryId);
+			}
+
 			final IFacetManager facetManager = ModelUtil.getManager(IFacetManager.class, eclipseBugSearchContext);
 			createFacet(facetManager, "tags", "Tags", true);
 			createFacet(facetManager, "keywords", "Keywords", true);

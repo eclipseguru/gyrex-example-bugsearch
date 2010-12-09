@@ -3,4 +3,5 @@
    <implementation class="org.eclipse.gyrex.examples.bugsearch.internal.BugSearchRuntimeSetupComponent"/>
    <reference cardinality="1..1" interface="org.eclipse.gyrex.context.registry.IRuntimeContextRegistry" name="IRuntimeContextRegistry" policy="static"/>
    <reference cardinality="1..1" interface="org.eclipse.gyrex.http.application.manager.IApplicationManager" name="IApplicationManager" policy="static"/>
+   <reference cardinality="1..1" interface="org.eclipse.gyrex.persistence.storage.registry.IRepositoryRegistry" name="IRepositoryRegistry" policy="static"/>
 </scr:component>
