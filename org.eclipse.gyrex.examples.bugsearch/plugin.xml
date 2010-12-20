@@ -13,25 +13,6 @@
  -->
 <plugin>
    <extension
-         point="org.eclipse.gyrex.boot.serverroles">
-      <role
-            id="org.eclipse.gyrex.examples.bugsearch"
-            name="Eclipse Bug Search">
-         <requireBundle
-               symbolicName="org.eclipse.gyrex.examples.bugsearch">
-         </requireBundle>
-         <requireBundle
-               symbolicName="org.eclipse.gyrex.cds.model.solr">
-         </requireBundle>
-         <requireBundle
-               symbolicName="org.eclipse.gyrex.cds.service.solr">
-         </requireBundle>
-         <requireBundle
-               symbolicName="org.eclipse.gyrex.persistence.solr">
-         </requireBundle>
-      </role>
-   </extension>
-   <extension
          point="org.eclipse.gyrex.admin.setupwizard">
       <step
             class="org.eclipse.gyrex.examples.bugsearch.internal.setup.BugSearchSetupStep"
