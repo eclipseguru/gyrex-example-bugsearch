@@ -13,7 +13,7 @@ package org.eclipse.gyrex.examples.bugsearch.internal.setup;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.gyrex.preferences.PlatformScope;
+import org.eclipse.gyrex.preferences.CloudScope;
 import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class BugSearchDevSetup {
 		//  - org.eclipse.gyrex.boot.role.http.jetty
 		//  - org.eclipse.gyrex.examples.bugsearch
 		try {
-			final IEclipsePreferences preferences = new PlatformScope().getNode("org.eclipse.gyrex.boot");
+			final IEclipsePreferences preferences = new CloudScope().getNode("org.eclipse.gyrex.boot");
 			String roles = preferences.get("rolesToStart", "");
 			if (StringUtils.isNotBlank(roles)) {
 				roles += ",";

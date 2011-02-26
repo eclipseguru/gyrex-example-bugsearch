@@ -30,7 +30,7 @@ import org.eclipse.gyrex.persistence.internal.storage.DefaultRepositoryLookupStr
 import org.eclipse.gyrex.persistence.solr.internal.SolrActivator;
 import org.eclipse.gyrex.persistence.storage.registry.IRepositoryRegistry;
 import org.eclipse.gyrex.persistence.storage.settings.IRepositoryPreferences;
-import org.eclipse.gyrex.preferences.PlatformScope;
+import org.eclipse.gyrex.preferences.CloudScope;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -101,7 +101,7 @@ public class BugSearchRuntimeSetupComponent {
 		}
 
 		// define the repository
-		final IEclipsePreferences repositoryStore = new PlatformScope().getNode("org.eclipse.gyrex.persistence");
+		final IEclipsePreferences repositoryStore = new CloudScope().getNode("org.eclipse.gyrex.persistence");
 		repositoryStore.node("repositories/" + IEclipseBugSearchConstants.REPOSITORY_ID).put("type", "org.eclipse.gyrex.persistence.solr.embedded");
 		try {
 			repositoryStore.flush();
@@ -123,7 +123,7 @@ public class BugSearchRuntimeSetupComponent {
 		try {
 			// create facets repo
 			final String repositoryId = "eclipsebugsearch.facets";
-			if (null == repositoryRegistry.getRepositoryPreferences(repositoryId)) {
+			if (null == repositoryRegistry.getRepositoryDefinition(repositoryId)) {
 				final IRepositoryPreferences repository = repositoryRegistry.createRepository(repositoryId, IContextPreferencesRepositoryConstants.PROVIDER_ID);
 				final IEclipsePreferences prefs = repository.getPreferences();
 				prefs.put(IContextPreferencesRepositoryConstants.PREF_KEY_CONTEXT_PATH, eclipseBugSearchContext.getContextPath().toString());
