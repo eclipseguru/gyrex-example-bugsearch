@@ -14,12 +14,13 @@ package org.eclipse.gyrex.examples.bugsearch.internal.app;
 import javax.servlet.ServletException;
 
 import org.eclipse.gyrex.context.IRuntimeContext;
-import org.eclipse.gyrex.examples.bugsearch.gwt.internal.client.service.BugSearchService;
 import org.eclipse.gyrex.examples.bugsearch.internal.BugSearchActivator;
+import org.eclipse.gyrex.examples.bugsearch.internal.restapi.SearchServlet;
 import org.eclipse.gyrex.http.application.Application;
-import org.eclipse.gyrex.http.registry.internal.BundleResourceProvider;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 /**
  * A fan shop application instance.
@@ -30,21 +31,13 @@ public class BugSearchApplication extends Application {
 		super(id, context);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.gyrex.http.application.Application#doInit()
-	 */
 	@Override
 	protected void doInit() throws CoreException {
 		try {
-			// register the front end and its services
-			getApplicationServiceSupport().registerResources("/", "frontend", new BundleResourceProvider(BugSearchActivator.getInstance().getBundle("org.eclipse.gyrex.examples.bugsearch.gwt.internal")));
-			getApplicationServiceSupport().registerServlet("/" + BugSearchService.ENTRYPOINT_SERVICE, new BugSearchServiceServlet(getContext()), null);
-
-			// register the  listing servlet
-			//getApplicationServiceSupport().registerServlet("/", new ListingServlet(getContext()), null);
-			getApplicationServiceSupport().registerServlet("/query", new BugSearchRestServlet(getContext()), null);
+			// register the API servlets
+			getApplicationServiceSupport().registerServlet("/search", new SearchServlet(getContext()), null);
 		} catch (final ServletException e) {
-			throw new CoreException(BugSearchActivator.getInstance().getStatusUtil().createError(0, e.getMessage(), e));
+			throw new CoreException(new Status(IStatus.ERROR, BugSearchActivator.PLUGIN_ID, e.getMessage(), e));
 		}
 
 	}

@@ -20,5 +20,19 @@
             name="Gyrex Bug Search">
       </product>
    </extension>
+   <extension
+         point="org.eclipse.gyrex.jobs.providers">
+      <job
+            class="org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugSearchIndexJob"
+            id="org.eclipse.gyrex.examples.bugsearch.jobs.indexing">
+      </job>
+   </extension>
+   <extension
+         point="org.eclipse.gyrex.jobs.providers">
+      <job
+            class="org.eclipse.gyrex.examples.bugsearch.internal.indexing.BugsSearchIndexJob"
+            id="org.eclipse.gyrex.examples.bugsearch.jobs.indexing">
+      </job>
+   </extension>
 
 </plugin>

@@ -103,4 +103,9 @@ public class BugSearchActivator extends BaseBundleActivator {
 		}
 		return proxy;
 	}
+
+	@Override
+	protected Class getDebugOptions() {
+		return BugSearchDebug.class;
+	}
 }

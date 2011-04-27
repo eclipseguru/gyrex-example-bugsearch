@@ -1,0 +1,5 @@
+# general option
+org.eclipse.gyrex.examples.bugsearch/debug=true
+
+# http api requests
+org.eclipse.gyrex.examples.bugsearch/httpApiRequests=true
